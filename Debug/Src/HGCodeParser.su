@@ -1,0 +1,11 @@
+HGCodeParser.c:15:6:HGCodeInit	0	static
+HGCodeParser.c:44:6:HGCodeDMAStart	0	static
+HGCodeParser.c:48:8:HGCodeCheckCommandBuffer	0	static
+HGCodeParser.c:56:8:HGCodeCheckDataBuffer	0	static
+HGCodeParser.c:171:10:HGCodeGetCommandCount	0	static
+HGCodeParser.c:175:22:HGCodeGetCommandData	12	static
+HGCodeParser.c:190:6:HGCodePutData	8	static
+HGCodeParser.c:220:9:HGCodeCharToInt	12	static
+HGCodeParser.c:230:8:HGCodeCharToDouble	48	static
+HGCodeParser.c:65:6:HGCodeDecodeCommand	72	static
+HGCodeParser.c:249:6:DecodeTimerInterruptHandler	8	static
