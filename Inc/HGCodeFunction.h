@@ -52,5 +52,6 @@ void H10();
 void H11();
 void H20();
 void H21();
+void H100();
 
 #endif /* HGC_INC_HGCODEFUNCTION_H_ */

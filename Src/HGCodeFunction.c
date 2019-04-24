@@ -50,6 +50,8 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 				case 21:
 					H21();
 					break;
+				case 100:
+					H100();
 				default:
 					break;
 				}
@@ -114,5 +116,9 @@ void H20(){ //UV COOLER OFF
 void H21(){ //UV COOLER ON
 	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_SET);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H21 OK",6);
+}
+void H100(){
+	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
+	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H100 OK",7);
 }
 

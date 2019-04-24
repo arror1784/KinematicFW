@@ -13,7 +13,7 @@ uint8_t HGCodeBuffer[MAX_HGCODE_BUFFER] = {0};
 HGCodeControl_t HGCodeControl = {0};
 
 void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
-	HGCodeControl.HGCodeUartHandle =HGCodeUsartHandle;
+	HGCodeControl.HGCodeUartHandle = HGCodeUsartHandle;
 	HGCodeControl.HGCodeDmaHandle = HGCodeDmaHandle;
 	HGCodeControl.HGCodeBufferControl.GHCodeHuffer = HGCodeBuffer;
 	HGCodeControl.HGCodeBufferControl.bufferSize = MAX_HGCODE_BUFFER;
@@ -25,17 +25,6 @@ void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeD
 	HGCodeControl.dataRear = 0;
 	HGCodeControl.dataFront = 0;
 
-	/*for(int i = 0 ; i < MAX_COMMAND;i++){
-		HGCodeControl.HGCodeDataControl[i].HGCodeCommand.G = -1;
-		HGCodeControl.HGCodeDataControl[i].HGCodeCommand.H = -1;
-
-		HGCodeControl.HGCodeDataControl[i].HGCodeParameter.A = 0;
-		HGCodeControl.HGCodeDataControl[i].HGCodeParameter.B = 0;
-		HGCodeControl.HGCodeDataControl[i].HGCodeParameter.C = 0;
-		HGCodeControl.HGCodeDataControl[i].HGCodeParameter.P = 0;
-		HGCodeControl.HGCodeDataControl[i].HGCodeParameter.M = 0;
-		HGCodeControl.HGCodeDataControl[i].HGCodeParameter.checkSum = 0;
-	}*/
 	memset(HGCodeControl.HGCodeDataControl,0x00,sizeof(HGCodeDataControl_t)*MAX_COMMAND);
 }
 
@@ -60,7 +49,9 @@ int8_t HGCodeCheckDataBuffer(void){
 		return 0;
 	}
 }
-
+uint16_t HGCodeGetCommandCount(void){
+	return HGCodeControl.commandCount;
+}
 
 void HGCodeDecodeCommand(void){
 
@@ -95,7 +86,6 @@ void HGCodeDecodeCommand(void){
 			index = (index + 1) % MAX_HGCODE_BUFFER;
 			break;
 		}
-
 		switch(HGCodeBuffer[index]){
 			case 'G':
 			case 'H':
@@ -112,23 +102,13 @@ void HGCodeDecodeCommand(void){
 					i--;
 					index = (index + 1) % MAX_HGCODE_BUFFER;
 				}
-				while(HGCodeBuffer[index] != ' '){
-					/*if(HGCodeBuffer[index] == ';'){
-						HGCodeControl.commandCount++;
-						HGCodeControl.dataFront = (HGCodeControl.dataFront + 1) % MAX_COMMAND;
-						index = (index + 1) % MAX_HGCODE_BUFFER;
-
-						i = (-1);
-
-						break;
-					}*/
+				while(HGCodeBuffer[index] != ' ' && HGCodeBuffer[index] != ';'){
 					buff[j] = HGCodeBuffer[index];
 					j++;
 					index = (index + 1) % MAX_HGCODE_BUFFER;
 					i--;
 				}
-				//i--;
-				//index = (index + 1) % MAX_HGCODE_BUFFER;
+
 				switch(HGCodeBuffer[data]){
 				case 'G':
 					HGCodePutData(HGCodeCharToInt(buff,j) * sign,HGCODE_G);
@@ -162,13 +142,18 @@ void HGCodeDecodeCommand(void){
 			default:
 				break;
 		}
-		//index = (index + 1) % MAX_HGCODE_BUFFER;
-		//i--;
+		if(HGCodeBuffer[index] == ';'){
+			HGCodeControl.commandCount++;
+			HGCodeControl.dataFront = (HGCodeControl.dataFront + 1) % MAX_COMMAND;
+
+			index = (index + 1) % MAX_HGCODE_BUFFER;
+			break;
+		}
 	}
 	HGCodeControl.HGCodeBufferControl.rear = index;
 }
 
-uint16_t HGCodeGetCommandCount(void){
+uint16_t HGCodeGet (void){
 	return HGCodeControl.commandCount;
 }
 
@@ -251,20 +236,4 @@ void DecodeTimerInterruptHandler(void){
 		HGCodeDecodeCommand();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

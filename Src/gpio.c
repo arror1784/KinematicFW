@@ -69,7 +69,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(COOLER_SIGNAL_GPIO_Port, COOLER_SIGNAL_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, COOLER_SIGNAL_Pin|GPIO_PIN_5, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SERVO_EN_Pin|SERVO_RESET_Pin|MOTOR_DIR_1_Pin, GPIO_PIN_RESET);
@@ -83,12 +83,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = COOLER_SIGNAL_Pin;
+  /*Configure GPIO pins : PAPin PA5 */
+  GPIO_InitStruct.Pin = COOLER_SIGNAL_Pin|GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(COOLER_SIGNAL_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
   GPIO_InitStruct.Pin = SERVO_EN_Pin|SERVO_RESET_Pin|MOTOR_DIR_1_Pin;

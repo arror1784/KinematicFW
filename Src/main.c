@@ -119,6 +119,7 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+//  HAL_UART_Transmit_IT(&huart2,"hello",5);
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
 
   /* USER CODE END 2 */
