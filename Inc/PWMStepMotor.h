@@ -55,6 +55,7 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t ti
 uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,uint16_t speed);
 
 uint32_t STMotorWaitingActivate(STMotorHandle_t* STMotorHandle,uint32_t timeOut);
+uint8_t STMotorIsActivate(STMotorHandle_t* STMotorHandle);
 
 uint32_t STMotorGoHome(STMotorHandle_t* STMotorHandle);
 uint32_t STMotorSetHome(STMotorHandle_t* STMotorHandle);

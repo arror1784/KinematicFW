@@ -12,7 +12,7 @@
 #include <stm32f4xx_hal.h>
 #include <usart.h>
 
-#define MAX_HGCODE_BUFFER 500
+#define MAX_HGCODE_BUFFER 200
 #define MAX_COMMAND 10
 
 #define HGCODE_G		0

@@ -11,6 +11,7 @@
 
 uint8_t HGCodeBuffer[MAX_HGCODE_BUFFER] = {0};
 HGCodeControl_t HGCodeControl = {0};
+uint8_t buff[20] = {0};
 
 void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 	HGCodeControl.HGCodeUartHandle = HGCodeUsartHandle;
@@ -49,9 +50,6 @@ int8_t HGCodeCheckDataBuffer(void){
 		return 0;
 	}
 }
-uint16_t HGCodeGetCommandCount(void){
-	return HGCodeControl.commandCount;
-}
 
 void HGCodeDecodeCommand(void){
 
@@ -61,10 +59,8 @@ void HGCodeDecodeCommand(void){
 	int index = rear;
 	int data;
 	int8_t sign = 1;
-	uint8_t buff[20] = {0};
 	int j = 0;
-
-	HAL_UART_Transmit(&huart1,(uint8_t*)"hello\r\n",7,1000);
+	//HAL_UART_Transmit(&huart1,(uint8_t*)"hello\r\n",7,1000);
 
 	if( rear < front){
 		receiveDataSize = front - rear;
@@ -137,7 +133,6 @@ void HGCodeDecodeCommand(void){
 				}
 				j=0;
 				sign = 1;
-				memset(buff,0x00,sizeof(buff));
 				break;
 			default:
 				break;
@@ -153,7 +148,7 @@ void HGCodeDecodeCommand(void){
 	HGCodeControl.HGCodeBufferControl.rear = index;
 }
 
-uint16_t HGCodeGet (void){
+uint16_t HGCodeGetCommandCount (void){
 	return HGCodeControl.commandCount;
 }
 

@@ -272,6 +272,9 @@ uint32_t STMotorWaitingActivate(STMotorHandle_t* STMotorHandle,uint32_t timeOut)
 	}
 	return 0;
 }
+uint8_t STMotorIsActivate(STMotorHandle_t* STMotorHandle){
+	return STMotorHandle->motorHandler.isActivate;
+}
 
 uint32_t STMotorGoHome(STMotorHandle_t* STMotorHandle){
 	int32_t step = -STMotorHandle->motorParam.curPosition;

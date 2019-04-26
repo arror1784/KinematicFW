@@ -58,16 +58,16 @@ void FinishCallBack(STMotorHandle_t *STMotorHandle){
 
 	switch(STMotorHandle->motorHandler.deviceNumber){
 		case 0x00:
-			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE OK A",9);
+			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE A OK",9);
 			break;
 		case 0x01:
-			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE OK B",9);
+			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE B OK",9);
 			break;
 		case 0x02:
-			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE OK C",9);
+			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE C OK",9);
 			break;
 		case 0x03:
-			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE OK P",9);
+			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE P OK",9);
 			break;
 		default:
 			break;
