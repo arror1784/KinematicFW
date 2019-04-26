@@ -83,12 +83,16 @@ void PWMPulseInterruptHandle(TIM_HandleTypeDef *htim){
 	}
 }
 
-void EXTInterruptHandle(void){
+void EXTInterruptHandle(uint16_t GPIO_Pin){
 
-	if(__HAL_GPIO_EXTI_GET_FLAG(MOTOR_1_ENDSTOP_PIN)){
+	switch(GPIO_Pin){
+	case MOTOR_1_ENDSTOP_PIN:
 		STMotorEXTInterruptHandle(&STMotorDevices[0]);
+		break;
 	}
 }
+
+
 
 
 

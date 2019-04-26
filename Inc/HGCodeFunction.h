@@ -52,6 +52,12 @@ void H10();
 void H11();
 void H20();
 void H21();
+void H30();
+void H31();
+void H32();
+void H33();
+
+
 void H100();
 
 #endif /* HGC_INC_HGCODEFUNCTION_H_ */

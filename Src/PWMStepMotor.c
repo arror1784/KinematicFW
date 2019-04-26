@@ -100,8 +100,14 @@ uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed){
 uint32_t STMotorSetcurSpeed(STMotorHandle_t* STMotorHandle, uint32_t curSpeed){
 	return STMotorHandle->motorParam.curSpeed = curSpeed;
 }
-uint16_t STMotorSetDeviceNum(STMotorHandle_t* STMotorHandle,uint16_t devieNum){
-	return STMotorHandle->motorHandler.deviceNumber;
+uint16_t STMotorSetDeviceNum(STMotorHandle_t* STMotorHandle,uint16_t deviceNum){
+	return STMotorHandle->motorHandler.deviceNumber = deviceNum;
+}
+uint32_t STMotorSetAccelSpeed(STMotorHandle_t* STMotorHandle, uint32_t accel){
+	return STMotorHandle->motorParam.accel = accel;
+}
+uint32_t STMotorSetDecelSpeed(STMotorHandle_t* STMotorHandle, uint32_t decel){
+	return STMotorHandle->motorParam.decel = decel;
 }
 
 uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep){
@@ -332,11 +338,11 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 	switch(STMotorHandle->motorParam.state){
 
 		case STATE_INFINITE:
-			if(STMotorHandle->motorParam.state == STATE_HARDSTOP){
-				STMotorHandle->motorParam.state = STATE_STOP;
-			}else if(STMotorHandle->motorParam.state == STATE_SOFTSTOP){
-				STMotorHandle->motorParam.state = STATE_DECEL;
-			}
+//			if(STMotorHandle->motorParam.state == STATE_HARDSTOP){
+//				STMotorHandle->motorParam.state = STATE_STOP;
+//			}else if(STMotorHandle->motorParam.state == STATE_SOFTSTOP){
+//				STMotorHandle->motorParam.state = STATE_DECEL;
+//			}
 			break;
 		case STATE_ACCEL:
 			if(relStep >= targetStep){
@@ -413,7 +419,6 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			STMotorHandle->motorParam.state = STATE_STOP;
 			STMotorStopFreq(STMotorHandle);
 			break;
-
 		default:
 			break;
 	}

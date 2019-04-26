@@ -41,7 +41,7 @@ void SetEnableIRQ(STMotorHandle_t *STMotorHandle,bool flag);
 void FinishCallBack(STMotorHandle_t *STMotorHandle);
 
 void PWMPulseInterruptHandle(TIM_HandleTypeDef *htim);
-void EXTInterruptHandle(void);
+void EXTInterruptHandle(uint16_t GPIO_Pin);
 
 //#endif
 

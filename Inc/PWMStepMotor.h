@@ -36,7 +36,10 @@ uint32_t STMotorSetMicroStep(STMotorHandle_t* STMotorHandle, uint32_t microStep)
 uint32_t STMotorSetMotorStep(STMotorHandle_t* STMotorHandle, uint32_t motorStep);
 uint32_t STMotorSetMaxSpeed(STMotorHandle_t* STMotorHandle, uint32_t maxSpeed);
 uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed);
-uint32_t STMotorSetCurSpeed(STMotorHandle_t* STMotorHandle, uint32_t curSpeed);
+uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed);
+uint32_t STMotorSetAccelSpeed(STMotorHandle_t* STMotorHandle, uint32_t accel);
+uint32_t STMotorSetDecelSpeed(STMotorHandle_t* STMotorHandle, uint32_t decel);
+
 
 uint32_t STMotorClearCurPosition(STMotorHandle_t* STMotorHandle);
 
