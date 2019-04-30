@@ -33,6 +33,8 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 				case 28:
 					G28();
 					break;
+				case 27:
+					G27();
 				default:
 					break;
 				}
@@ -50,6 +52,18 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 					break;
 				case 21:
 					H21();
+					break;
+				case 30:
+					H30();
+					break;
+				case 31:
+					H31();
+					break;
+				case 32:
+					H32();
+					break;
+				case 33:
+					H33();
 					break;
 				case 100:
 					H100();
@@ -104,9 +118,11 @@ void G27(){
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G27 OK",6);
 }
 void G28(){
-	STMotorAutoHome(&STMotorDevices[0],0);
+	//STMotorAutoHome(&STMotorDevices[0],0);
+	HAL_Delay(2000);
 	//STMotorWaitingActivate(&STMotorDevices[0],0);
-//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G28 OK",6);
+	//HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G28 OK",6);
+	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
 }
 void G30(){
 	return;
@@ -139,7 +155,7 @@ void H21(){ //UV COOLER ON
 	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_SET);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H21 OK",6);
 }
-void H30(){
+void H30(){ //SET MAX SPEED
 	if(temp->HGCodeParameter.A){
 		STMotorSetMaxSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
@@ -152,9 +168,10 @@ void H30(){
 		STMotorSetMaxSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
 		temp->HGCodeParameter.C = 0;
 	}
+	HAL_Delay(5);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H30 OK",6);
 }
-void H31(){
+void H31(){ //SET MIN SPEED
 	if(temp->HGCodeParameter.A){
 		STMotorSetMinSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
@@ -167,10 +184,14 @@ void H31(){
 		STMotorSetMinSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
 		temp->HGCodeParameter.C = 0;
 	}
+	HAL_Delay(5);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H31 OK",6);
 }
-void H32(){
+void H32(){ //SET ACCEL SPEED
 	if(temp->HGCodeParameter.A){
+//		char buff[10];
+//		sprintf(buff,"%d",temp->HGCodeParameter.A);
+//		HAL_UART_Transmit_IT(&huart2,buff,10);
 		STMotorSetAccelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
 	}
@@ -182,9 +203,10 @@ void H32(){
 		STMotorSetAccelSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
 		temp->HGCodeParameter.C = 0;
 	}
+	HAL_Delay(5);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H32 OK",6);
 }
-void H33(){
+void H33(){ //SET DECEL SPEED
 	if(temp->HGCodeParameter.A){
 		STMotorSetDecelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
@@ -197,6 +219,7 @@ void H33(){
 		STMotorSetDecelSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
 		temp->HGCodeParameter.C = 0;
 	}
+	HAL_Delay(5);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H33 OK",6);
 }
 

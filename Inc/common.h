@@ -76,8 +76,8 @@ typedef enum{
 
 typedef enum{
 
-	DIR_FORWORD = 0,
-	DIR_BACKWORD = 1,
+	DIR_FORWORD = 1,
+	DIR_BACKWORD = 0,
 	DIR_UNKNOWN = 2
 
 }MotorDirection_t;
