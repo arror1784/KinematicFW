@@ -70,10 +70,10 @@ uint32_t STMotorSetFreq(STMotorHandle_t* STMotorHandle,uint32_t freq);
 uint32_t STMotorStopFreq(STMotorHandle_t* STMotorHandle);
 
 double STMotorCalcStepToRotation(uint32_t nStep);
-uint32_t STMotorCalcRotationToStep(double rotation);
+int32_t STMotorCalcRotationToStep(double rotation);
 
 double STMotorCalcStepToMilli(uint32_t nStep);
-uint32_t STMotorCalcMilliToStep(double milli);
+int32_t STMotorCalcMilliToStep(double milli);
 
 double STMotorCalcRotationToMilli(double rotation);
 double STMotorCalcMilliToRotation(double milli);

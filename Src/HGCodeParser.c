@@ -97,6 +97,7 @@ void HGCodeDecodeCommand(void){
 					sign = -1;
 					i--;
 					index = (index + 1) % MAX_HGCODE_BUFFER;
+					HAL_UART_Transmit(&huart2,"sign : -1\r\n",11,1000);
 				}
 				while(HGCodeBuffer[index] != ' ' && HGCodeBuffer[index] != ';'){
 					buff[j] = HGCodeBuffer[index];
@@ -104,7 +105,6 @@ void HGCodeDecodeCommand(void){
 					index = (index + 1) % MAX_HGCODE_BUFFER;
 					i--;
 				}
-
 				switch(HGCodeBuffer[data]){
 				case 'G':
 					HGCodePutData(HGCodeCharToInt(buff,j) * sign,HGCODE_G);
@@ -140,7 +140,6 @@ void HGCodeDecodeCommand(void){
 		if(HGCodeBuffer[index] == ';'){
 			HGCodeControl.commandCount++;
 			HGCodeControl.dataFront = (HGCodeControl.dataFront + 1) % MAX_COMMAND;
-
 			index = (index + 1) % MAX_HGCODE_BUFFER;
 			break;
 		}

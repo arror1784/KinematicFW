@@ -77,6 +77,9 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 	}
 }
 void G01(){
+	char buff[20];
+	sprintf(buff,"%lf",temp->HGCodeParameter.A);
+	HAL_UART_Transmit(&huart2,buff,20,1000);
 
 	if(temp->HGCodeParameter.A){
 		if(!STMotorIsActivate(&STMotorDevices[0])){

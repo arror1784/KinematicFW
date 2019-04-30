@@ -195,6 +195,7 @@ uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
 	if(STMotorHandle->motorHandler.isActivate == FALSE){
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(step == 0){
+			STMotorHandle->motorHandler.isActivate = FALSE;
 			return 1;
 		}else if(step < 0) {
 			STMotorHandle->motorParam.targetStep = -step;
@@ -308,7 +309,7 @@ double STMotorCalcStepToRotation(uint32_t nStep){
 	//return nStep/(STMotorDeviceControl.GetMicroStep() * STMotorDeviceControl.GetMotorStep());
 	return nStep/MOTOR_DRIVER_MiCRO_STEP * MOTOR_STEP;
 }
-uint32_t STMotorCalcRotationToStep(double rotation){
+int32_t STMotorCalcRotationToStep(double rotation){
 	//return (double)(STMotorDeviceControl.GetMicroStep() * STMotorDeviceControl.GetMotorStep()) * rotation;
 	return (double)(MOTOR_DRIVER_MiCRO_STEP * MOTOR_STEP) * rotation;
 }
@@ -326,9 +327,10 @@ double STMotorCalcStepToMilli(uint32_t nStep){
 	//return nStep/(STMotorDeviceControl.GetMicroStep() * STMotorDeviceControl.GetMotorStep()) * STMotorDeviceControl.GetMotorPitch();
 	return nStep/(MOTOR_DRIVER_MiCRO_STEP * MOTOR_STEP) * MOTOR_SCREW_PITCH;
 }
-uint32_t STMotorCalcMilliToStep(double milli){
+int32_t STMotorCalcMilliToStep(double milli){
 	//return (milli / STMotorDeviceControl.GetMotorPitch()) * (STMotorDeviceControl.GetMicroStep() * STMotorDeviceControl.GetMotorStep());
-	return (milli / (double)MOTOR_SCREW_PITCH) * (MOTOR_DRIVER_MiCRO_STEP * MOTOR_STEP);
+//	return (milli * ((double)MOTOR_SCREW_PITCH) * (MOTOR_DRIVER_MiCRO_STEP * MOTOR_STEP));
+	return (milli / ((double)MOTOR_SCREW_PITCH)) * (MOTOR_DRIVER_MiCRO_STEP * MOTOR_STEP);
 }
 
 
