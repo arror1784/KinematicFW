@@ -77,11 +77,7 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 	}
 }
 void G01(){
-	char buff[20];
-	sprintf(buff,"%lf",temp->HGCodeParameter.A);
-	HAL_UART_Transmit(&huart2,buff,20,1000);
-
-	if(temp->HGCodeParameter.A){
+		if(temp->HGCodeParameter.A){
 		if(!STMotorIsActivate(&STMotorDevices[0])){
 			STMotorGoMilli(&STMotorDevices[0],temp->HGCodeParameter.A);
 		}else{
@@ -122,7 +118,8 @@ void G27(){
 }
 void G28(){
 	//STMotorAutoHome(&STMotorDevices[0],0);
-	HAL_Delay(2000);
+	//HAL_Delay(100);
+	STMotorGoMilli(&STMotorDevices[0],5);
 	//STMotorWaitingActivate(&STMotorDevices[0],0);
 	//HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G28 OK",6);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
@@ -192,9 +189,6 @@ void H31(){ //SET MIN SPEED
 }
 void H32(){ //SET ACCEL SPEED
 	if(temp->HGCodeParameter.A){
-//		char buff[10];
-//		sprintf(buff,"%d",temp->HGCodeParameter.A);
-//		HAL_UART_Transmit_IT(&huart2,buff,10);
 		STMotorSetAccelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
 	}

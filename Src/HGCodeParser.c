@@ -60,7 +60,6 @@ void HGCodeDecodeCommand(void){
 	int data;
 	int8_t sign = 1;
 	int j = 0;
-	//HAL_UART_Transmit(&huart1,(uint8_t*)"hello\r\n",7,1000);
 
 	if( rear < front){
 		receiveDataSize = front - rear;
@@ -72,8 +71,6 @@ void HGCodeDecodeCommand(void){
 
 	//(index+1) % 배열의 사이즈
 	for(int i = receiveDataSize; i > 0; i--,index = (index + 1) % MAX_HGCODE_BUFFER){
-
-		//HAL_UART_Transmit_DMA(HGCodeControl.HGCodeUartHandle,&HGCodeBuffer[index],1);
 
 		if(HGCodeBuffer[index] == ';'){
 			HGCodeControl.commandCount++;
@@ -97,7 +94,6 @@ void HGCodeDecodeCommand(void){
 					sign = -1;
 					i--;
 					index = (index + 1) % MAX_HGCODE_BUFFER;
-					HAL_UART_Transmit(&huart2,"sign : -1\r\n",11,1000);
 				}
 				while(HGCodeBuffer[index] != ' ' && HGCodeBuffer[index] != ';'){
 					buff[j] = HGCodeBuffer[index];

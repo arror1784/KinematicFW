@@ -73,6 +73,7 @@
 
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart2_rx;
+extern DMA_HandleTypeDef hdma_tim1_ch4_trig_com;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,13 +94,13 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	STMotorHandle_t STMotorDevices[1];
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -120,13 +121,14 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM6_Init();
   MX_I2C2_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 //  HAL_UART_Transmit_IT(&huart2,"hello",5);
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
   //STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
   //STMotorInitParam(&STMotorDevices[0],1000,400,MAX_SPEED,MIN_SPEED);
 
-  STMotorGoRotation(&STMotorDevices[0],5);
+//  STMotorGoRotation(&STMotorDevices[0],5);
   /* USER CODE END 2 */
 
   /* Infinite loop */
