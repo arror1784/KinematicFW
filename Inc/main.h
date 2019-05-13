@@ -79,44 +79,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MOTOR_ENDBTN_1_Pin GPIO_PIN_0
-#define MOTOR_ENDBTN_1_GPIO_Port GPIOC
-#define MOTOR_ENDBTN_1_EXTI_IRQn EXTI0_IRQn
-#define POWER_BTN_Pin GPIO_PIN_3
-#define POWER_BTN_GPIO_Port GPIOC
-#define POWER_BTN_EXTI_IRQn EXTI3_IRQn
-#define MOTOR_STEP_1_Pin GPIO_PIN_0
-#define MOTOR_STEP_1_GPIO_Port GPIOA
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
-#define COOLER_SIGNAL_Pin GPIO_PIN_4
-#define COOLER_SIGNAL_GPIO_Port GPIOA
-#define SERVO_EN_Pin GPIO_PIN_0
-#define SERVO_EN_GPIO_Port GPIOB
-#define SERVO_RESET_Pin GPIO_PIN_1
-#define SERVO_RESET_GPIO_Port GPIOB
-#define SENSOR_SCL_Pin GPIO_PIN_10
-#define SENSOR_SCL_GPIO_Port GPIOB
-#define MOTOR_DIR_1_Pin GPIO_PIN_15
-#define MOTOR_DIR_1_GPIO_Port GPIOB
-#define MOTOR_EN_1_Pin GPIO_PIN_9
-#define MOTOR_EN_1_GPIO_Port GPIOC
-#define NEOPIXEL_SIGNAL_Pin GPIO_PIN_11
-#define NEOPIXEL_SIGNAL_GPIO_Port GPIOA
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
-#define SENSOR_SDA_Pin GPIO_PIN_11
-#define SENSOR_SDA_GPIO_Port GPIOB
-#define SWO_Pin GPIO_PIN_3
-#define SWO_GPIO_Port GPIOB
-#define DEBUG_LOG_SERIAL_TX_Pin GPIO_PIN_6
-#define DEBUG_LOG_SERIAL_TX_GPIO_Port GPIOB
-#define DEBUG_LOG_SERIAL_RX_Pin GPIO_PIN_7
-#define DEBUG_LOG_SERIAL_RX_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

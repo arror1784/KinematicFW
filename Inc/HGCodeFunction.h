@@ -56,6 +56,7 @@ void H30();
 void H31();
 void H32();
 void H33();
+void H50();
 
 
 void H100();

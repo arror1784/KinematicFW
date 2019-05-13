@@ -43,6 +43,7 @@
 #include "main.h"
 /* USER CODE BEGIN Includes */
 #include "StepMotorDriver.h"
+#include "neoPixel.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

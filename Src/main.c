@@ -52,6 +52,7 @@
 #include "StepMotorDriver.h"
 #include "PWMStepMotor.h"
 #include "usart.h"
+#include "neoPixel.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,7 +62,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define LED 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -73,7 +74,8 @@
 
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart2_rx;
-extern DMA_HandleTypeDef hdma_tim1_ch4_trig_com;
+extern STMotorHandle_t STMotorDevices[1];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,13 +124,22 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C2_Init();
   MX_TIM1_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
 //  HAL_UART_Transmit_IT(&huart2,"hello",5);
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
-  //STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
-  //STMotorInitParam(&STMotorDevices[0],1000,400,MAX_SPEED,MIN_SPEED);
+//  STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
+//  STMotorInitParam(&STMotorDevices[0],1000,400,MAX_SPEED,MIN_SPEED);
 
 //  STMotorGoRotation(&STMotorDevices[0],5);
+//  setNeoPixel(&neoPixel,&htim1,TIM_CHANNEL_4,&hdma_tim1_ch4_trig_com,LED);
+//  for(int i = 0; i < LED; i++){
+//	  setColor(&neoPixel,converColorTo32(0,0xff,0xff),i);
+//  }
+//    updateColor(&neoPixel,LED);
+//    freeNeoPixel(&neoPixel);
+  //updateColor(ledBuff,LED);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

@@ -6,12 +6,18 @@
  */
 #include "HGCodeFunction.h"
 #include "string.h"
+#include "tim.h"
+#include "neoPixel.h"
 
 extern STMotorHandle_t STMotorDevices[1];
 extern HGCodeControl_t HGCodeControl;
+extern DMA_HandleTypeDef hdma_tim1_ch4_trig_com;
 
 HGCodeDataControl_t* temp = 0;
 uint8_t commandCount = 0;
+WS2812BControl_t neoPixel = {0};
+P_WS2812BControl_t neoPixel_P = &neoPixel;
+
 void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 
 	HGCodeInit(HGCodeUsartHandle,HGCodeDmaHandle);
@@ -20,6 +26,9 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 
 	STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
 	STMotorInitParam(&STMotorDevices[0],1000,400,MAX_SPEED,MIN_SPEED);
+
+	setNeoPixel(neoPixel_P,&htim1,TIM_CHANNEL_4,&hdma_tim1_ch4_trig_com,10);
+	setColorBlack(neoPixel_P);
 
 	while(1){
 		if(HGCodeCheckDataBuffer() == 1){
@@ -65,8 +74,12 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 				case 33:
 					H33();
 					break;
+				case 50:
+					H50();
+					break;
 				case 100:
 					H100();
+					break;
 				default:
 					break;
 				}
@@ -219,7 +232,12 @@ void H33(){ //SET DECEL SPEED
 	HAL_Delay(5);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H33 OK",6);
 }
-
+void H50(){
+	for(int i = 0 ; i < neoPixel_P->ledCount; i++){
+		setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
+	}
+	updateColor(neoPixel_P);
+}
 void H100(){
 	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
 	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H100 OK",7);
