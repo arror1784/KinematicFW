@@ -56,8 +56,13 @@ void H30();
 void H31();
 void H32();
 void H33();
-void H50();
 
+void H40();
+void H41();
+void H42();
+void H43();
+void H50();
+void H60();
 
 void H100();
 

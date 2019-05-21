@@ -69,6 +69,10 @@ void HGCodeDecodeCommand(void){
 		return;
 	}
 
+//	HAL_UART_Transmit(&huart1,"input command low data : ",26,1000);
+//	HAL_UART_Transmit(&huart1,HGCodeBuffer,MAX_HGCODE_BUFFER,1000);
+//	HAL_UART_Transmit(&huart1,"\r\n",2,1000);
+
 	//(index+1) % 배열의 사이즈
 	for(int i = receiveDataSize; i > 0; i--,index = (index + 1) % MAX_HGCODE_BUFFER){
 

@@ -124,10 +124,12 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C2_Init();
   MX_TIM1_Init();
-  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
 //  HAL_UART_Transmit_IT(&huart2,"hello",5);
+//  HAL_UART_Transmit_IT(&huart1,"program start \r\n",100);
+//  HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
+
 //  STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
 //  STMotorInitParam(&STMotorDevices[0],1000,400,MAX_SPEED,MIN_SPEED);
 

@@ -237,7 +237,7 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t ti
 uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,uint16_t speed){
 
 	if(speed == 0){
-		STMotorGoSpeed(STMotorHandle,-MOTOR_MIN_SPEED,0);
+		STMotorGoSpeed(STMotorHandle,MOTOR_MIN_SPEED,0);
 	}else{
 		STMotorGoSpeed(STMotorHandle,speed,0);
 	}
@@ -317,24 +317,19 @@ int32_t STMotorCalcMilliToStep(double milli){
 
 uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 
-	uint32_t relStep = ++STMotorHandle->motorParam.nStep;
+	uint32_t relStep = STMotorHandle->motorParam.nStep++;
 	uint32_t targetStep = STMotorHandle->motorParam.targetStep;
 	uint32_t speed = STMotorHandle->motorParam.curSpeed;
 	uint32_t accel = STMotorHandle->motorParam.accel << 16;
 	uint32_t decel = STMotorHandle->motorParam.decel << 16;
 
-	STMotorHandle->motorParam.curPosition += STMotorHandle->motorParam.direction ? 1 : -1;
+//	STMotorHandle->motorParam.curPosition += STMotorHandle->motorParam.direction ? 1 : -1;
 
 	bool speedUpdated = FALSE;
 
 	switch(STMotorHandle->motorParam.state){
 
 		case STATE_INFINITE:
-//			if(STMotorHandle->motorParam.state == STATE_HARDSTOP){
-//				STMotorHandle->motorParam.state = STATE_STOP;
-//			}else if(STMotorHandle->motorParam.state == STATE_SOFTSTOP){
-//				STMotorHandle->motorParam.state = STATE_DECEL;
-//			}
 			break;
 		case STATE_ACCEL:
 			if(relStep >= targetStep){
@@ -344,7 +339,6 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			}else{
 				if(speed <= 0 )
 					speed = 1;
-
 				STMotorHandle->motorParam.accu += accel / speed;
 				while (STMotorHandle->motorParam.accu >= (0X10000L))
 				{
@@ -368,11 +362,14 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			}else if(relStep <= STMotorHandle->motorParam.endAccel){
 				STMotorHandle->motorParam.accu = 0;
 				STMotorHandle->motorParam.state = STATE_ACCEL;
+			}else if(relStep >= STMotorHandle->motorParam.targetStep){
+				STMotorHandle->motorParam.accu = 0;
+				STMotorHandle->motorParam.state = STATE_STOP;
 			}
 			break;
 		case STATE_SOFTSTOP:
 		case STATE_DECEL:
-			if(relStep >= targetStep-1 || speed <= STMotorHandle->motorParam.minSpeed){
+			if(relStep >= targetStep-1 || speed < STMotorHandle->motorParam.minSpeed){
 				STMotorHandle->motorParam.state = STATE_STOP;
 			}else if(relStep <= STMotorHandle->motorParam.startDecel){
 				STMotorHandle->motorParam.state = STATE_STAND;
@@ -404,9 +401,9 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			break;
 		case STATE_HARDSTOP:
 		case STATE_STOP:
-			//STMotorHandle->motorParam.curPosition += (STMotorHandle->motorParam.targetStep * (STMotorHandle->motorParam.direction) ? 1 : -1);
-			STMotorHandle->motorParam.nStep = 0;
-			STMotorHandle->motorParam.targetStep = 0;
+			STMotorHandle->motorParam.curPosition += relStep * ((STMotorHandle->motorParam.direction) ? 1 : -1);
+//			STMotorHandle->motorParam.nStep = 0;
+//			STMotorHandle->motorParam.targetStep = 0;
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			STMotorHandle->motorParam.state = STATE_STOP;
 			STMotorStopFreq(STMotorHandle);

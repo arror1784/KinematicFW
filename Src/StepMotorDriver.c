@@ -26,7 +26,7 @@ STMotorDeviceControl_t STMotorDeviceControl = {
 void SetDirectionGPIO(STMotorHandle_t *STMotorHandle, MotorDirection_t direction){
 	switch(STMotorHandle->motorHandler.deviceNumber){
 		case 0x00:
-			HAL_GPIO_WritePin(MOTOR_1_DIR_GPIOX,MOTOR_1_DIR_PINX,direction ? (GPIO_PIN_SET) : (GPIO_PIN_RESET));
+			HAL_GPIO_WritePin(MOTOR_DIR_1_GPIO_Port,MOTOR_DIR_1_Pin,direction ? (GPIO_PIN_SET) : (GPIO_PIN_RESET));
 			break;
 	}
 }
@@ -34,7 +34,7 @@ void SetDirectionGPIO(STMotorHandle_t *STMotorHandle, MotorDirection_t direction
 void SetEnableGPIO(STMotorHandle_t *STMotorHandle, bool flag){
 	switch(STMotorHandle->motorHandler.deviceNumber){
 		case 0x00:
-			HAL_GPIO_WritePin(MOTOR_1_ENABLE_GPIOX,MOTOR_1_ENABLE_PINX,flag ? (GPIO_PIN_RESET) : (GPIO_PIN_SET));
+			HAL_GPIO_WritePin(MOTOR_EN_1_GPIO_Port,MOTOR_EN_1_Pin,flag ? (GPIO_PIN_RESET) : (GPIO_PIN_SET));
 			break;
 	}
 }
@@ -84,27 +84,14 @@ void PWMPulseInterruptHandle(TIM_HandleTypeDef *htim){
 }
 
 void EXTInterruptHandle(uint16_t GPIO_Pin){
-
 	switch(GPIO_Pin){
 	case MOTOR_1_ENDSTOP_PIN:
 		STMotorEXTInterruptHandle(&STMotorDevices[0]);
+		HAL_UART_Transmit_IT(&huart2,"end stop interrupt\r\n",40);
+		break;
+	case POWER_BTN_Pin:
+		HAL_UART_Transmit_IT(&huart2,"FRNT BTN interrupt\r\n",40);
 		break;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

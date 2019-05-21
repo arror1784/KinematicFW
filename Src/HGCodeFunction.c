@@ -8,6 +8,7 @@
 #include "string.h"
 #include "tim.h"
 #include "neoPixel.h"
+#include "usart.h"
 
 extern STMotorHandle_t STMotorDevices[1];
 extern HGCodeControl_t HGCodeControl;
@@ -20,21 +21,28 @@ P_WS2812BControl_t neoPixel_P = &neoPixel;
 
 void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 
+	uint8_t buff[200] = {0};
+
 	HGCodeInit(HGCodeUsartHandle,HGCodeDmaHandle);
 	HGCodeDMAStart();
 	HAL_TIM_Base_Start_IT(timHandler);
 
-	STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
-	STMotorInitParam(&STMotorDevices[0],1000,400,MAX_SPEED,MIN_SPEED);
+	STMotorInitHandler(&STMotorDevices[0],&htim1,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);
+	STMotorInitParam(&STMotorDevices[0],400,400,MAX_SPEED,MIN_SPEED);
+//	STMotorInitParam(&STMotorDevices[0],0,0,0,0);
 
-	setNeoPixel(neoPixel_P,&htim1,TIM_CHANNEL_4,&hdma_tim1_ch4_trig_com,10);
-	setColorBlack(neoPixel_P);
+//	setNeoPixel(neoPixel_P,&htim1,TIM_CHANNEL_1,&hdma_tim1_ch4_trig_com,10);
+//	setColorBlack(neoPixel_P);
 
 	while(1){
 		if(HGCodeCheckDataBuffer() == 1){
 			temp = HGCodeGetCommandData();
-			if(temp->HGCodeCommand.G != 0){
 
+			sprintf(buff,"command count: %4d, G: %4d, H: %4d, A: %4.3lf\r\n",
+					commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,temp->HGCodeParameter.A);
+			HAL_UART_Transmit(&huart1,buff,100,1000);
+
+			if(temp->HGCodeCommand.G != 0){
 				switch(temp->HGCodeCommand.G){
 				case 01:
 					G01();
@@ -74,11 +82,26 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 				case 33:
 					H33();
 					break;
+				case 40:
+					H40();
+					break;
+				case 41:
+					H41();
+					break;
+				case 42:
+					H42();
+					break;
+				case 43:
+					H43();
+					break;
 				case 50:
-					H50();
+//					H50();
 					break;
 				case 100:
 					H100();
+					break;
+				case 60:
+					H60();
 					break;
 				default:
 					break;
@@ -90,11 +113,11 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 	}
 }
 void G01(){
-		if(temp->HGCodeParameter.A){
+	if(temp->HGCodeParameter.A){
 		if(!STMotorIsActivate(&STMotorDevices[0])){
 			STMotorGoMilli(&STMotorDevices[0],temp->HGCodeParameter.A);
 		}else{
-			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 A 1 FAIL",12);
+//			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 A 1 FAIL",12);
 		}
 		temp->HGCodeParameter.A = 0;
 	}
@@ -102,7 +125,7 @@ void G01(){
 		if(!STMotorIsActivate(&STMotorDevices[1])){
 			STMotorGoMilli(&STMotorDevices[1],temp->HGCodeParameter.B);
 		}else{
-			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 B 1 FAIL",12);
+//			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 B 1 FAIL",12);
 		}
 		temp->HGCodeParameter.B = 0;
 	}
@@ -110,7 +133,7 @@ void G01(){
 		if(!STMotorIsActivate(&STMotorDevices[2])){
 			STMotorGoMilli(&STMotorDevices[2],temp->HGCodeParameter.C);
 		}else{
-			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 C 1 FAIL",12);
+//			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 C 1 FAIL",12);
 		}
 		temp->HGCodeParameter.C = 0;
 	}
@@ -127,15 +150,12 @@ void G05(){
 }
 void G27(){
 	STMotorGoHome(&STMotorDevices[0]);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G27 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G27 OK",6);
 }
 void G28(){
-	//STMotorAutoHome(&STMotorDevices[0],0);
-	//HAL_Delay(100);
 	STMotorGoMilli(&STMotorDevices[0],5);
-	//STMotorWaitingActivate(&STMotorDevices[0],0);
-	//HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G28 OK",6);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
+//	STMotorAutoHome(&STMotorDevices[0],0);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
 }
 void G30(){
 	return;
@@ -153,20 +173,20 @@ void H05(){
 	return;
 }
 void H10(){ //UV LED OFF
-	HAL_GPIO_WritePin(UV_LCD_GPIO_Port,UV_LCD_Pin,GPIO_PIN_RESET);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H10 OK",6);
+	HAL_GPIO_WritePin(UV_LED_GPIO_Port,UV_LED_Pin,GPIO_PIN_RESET);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H10 OK",6);
 }
 void H11(){ //UV LED ON
-	HAL_GPIO_WritePin(UV_LCD_GPIO_Port,UV_LCD_Pin,GPIO_PIN_SET);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H11 OK",6);
+	HAL_GPIO_WritePin(UV_LED_GPIO_Port,UV_LED_Pin,GPIO_PIN_SET);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H11 OK",6);
 }
 void H20(){ //UV COOLER OFF
 	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_RESET);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H20 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H20 OK",6);
 }
 void H21(){ //UV COOLER ON
 	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_SET);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H21 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H21 OK",6);
 }
 void H30(){ //SET MAX SPEED
 	if(temp->HGCodeParameter.A){
@@ -182,61 +202,96 @@ void H30(){ //SET MAX SPEED
 		temp->HGCodeParameter.C = 0;
 	}
 	HAL_Delay(5);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H30 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H30 OK",6);
 }
 void H31(){ //SET MIN SPEED
 	if(temp->HGCodeParameter.A){
 		STMotorSetMinSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
 	}
-	if(temp->HGCodeParameter.B){
-		STMotorSetMinSpeed(&STMotorDevices[1],temp->HGCodeParameter.B);
-		temp->HGCodeParameter.B = 0;
-	}
-	if(temp->HGCodeParameter.C){
-		STMotorSetMinSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
-		temp->HGCodeParameter.C = 0;
-	}
+//	if(temp->HGCodeParameter.B){
+//		STMotorSetMinSpeed(&STMotorDevices[1],temp->HGCodeParameter.B);
+//		temp->HGCodeParameter.B = 0;
+//	}
+//	if(temp->HGCodeParameter.C){
+//		STMotorSetMinSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
+//		temp->HGCodeParameter.C = 0;
+//	}
 	HAL_Delay(5);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H31 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H31 OK",6);
 }
 void H32(){ //SET ACCEL SPEED
 	if(temp->HGCodeParameter.A){
 		STMotorSetAccelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
 	}
-	if(temp->HGCodeParameter.B){
-		STMotorSetAccelSpeed(&STMotorDevices[1],temp->HGCodeParameter.B);
-		temp->HGCodeParameter.B = 0;
-	}
-	if(temp->HGCodeParameter.C){
-		STMotorSetAccelSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
-		temp->HGCodeParameter.C = 0;
-	}
+//	if(temp->HGCodeParameter.B){
+//		STMotorSetAccelSpeed(&STMotorDevices[1],temp->HGCodeParameter.B);
+//		temp->HGCodeParameter.B = 0;
+//	}
+//	if(temp->HGCodeParameter.C){
+//		STMotorSetAccelSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
+//		temp->HGCodeParameter.C = 0;
+//	}
 	HAL_Delay(5);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H32 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H32 OK",6);
 }
 void H33(){ //SET DECEL SPEED
 	if(temp->HGCodeParameter.A){
 		STMotorSetDecelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
 		temp->HGCodeParameter.A = 0;
 	}
-	if(temp->HGCodeParameter.B){
-		STMotorSetDecelSpeed(&STMotorDevices[1],temp->HGCodeParameter.B);
-		temp->HGCodeParameter.B = 0;
-	}
-	if(temp->HGCodeParameter.C){
-		STMotorSetDecelSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
-		temp->HGCodeParameter.C = 0;
-	}
+//	if(temp->HGCodeParameter.B){
+//		STMotorSetDecelSpeed(&STMotorDevices[1],temp->HGCodeParameter.B);
+//		temp->HGCodeParameter.B = 0;
+//	}
+//	if(temp->HGCodeParameter.C){
+//		STMotorSetDecelSpeed(&STMotorDevices[2],temp->HGCodeParameter.B);
+//		temp->HGCodeParameter.C = 0;
+//	}
 	HAL_Delay(5);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H33 OK",6);
+//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H33 OK",6);
+}
+void H40(){
+	uint8_t buff[50] = {0};
+	if(temp->HGCodeParameter.A){
+		sprintf(buff,"max speed %d\r\n",STMotorDevices[0].motorParam.maxSpeed);
+		HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
+//		HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20);
+
+	}
+}
+void H41(){
+	uint8_t buff[50] = {0};
+	if(temp->HGCodeParameter.A){
+		sprintf(buff,"min speed %d\r\n",STMotorDevices[0].motorParam.minSpeed);
+		HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
+	}
+}
+void H42(){
+	uint8_t buff[50] = {0};
+	if(temp->HGCodeParameter.A){
+		sprintf(buff,"accel speed %d\r\n",STMotorDevices[0].motorParam.accel);
+		HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
+	}
+}
+void H43(){
+	uint8_t buff[50] = {0};
+	if(temp->HGCodeParameter.A){
+		sprintf(buff,"decel speed %lu\r\n",	STMotorDevices[0].motorParam.decel);
+		HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
+	}
 }
 void H50(){
 	for(int i = 0 ; i < neoPixel_P->ledCount; i++){
 		setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
 	}
 	updateColor(neoPixel_P);
+}
+void H60(){
+	uint8_t buff[50] = {0};
+	sprintf(buff,"current position %ld \r\n",STMotorDevices[0].motorParam.curPosition);
+	HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
 }
 void H100(){
 	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
