@@ -105,7 +105,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  char abc[10];
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -128,6 +128,8 @@ int main(void)
 //  HAL_UART_Transmit_IT(&huart2,"hello",5);
 //  HAL_UART_Transmit_IT(&huart1,"program start \r\n",100);
 //  HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+
+
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
 
 //  STMotorInitHandler(&STMotorDevices[0],&htim5,TIM_CHANNEL_1,MOTOR_1_ENDSTOP_IRQN);

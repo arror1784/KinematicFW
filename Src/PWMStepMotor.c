@@ -34,7 +34,8 @@ bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handl
 
 	HAL_NVIC_DisableIRQ(STMotorHandle->motorHandler.IRQn);
 
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 	return TRUE;
 }
 
@@ -152,7 +153,7 @@ uint32_t STMotorSetFreq(STMotorHandle_t* STMotorHandle,uint32_t freq){
 }
 
 uint32_t STMotorStopFreq(STMotorHandle_t* STMotorHandle){
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
 	HAL_TIM_PWM_Stop_IT(STMotorHandle->motorHandler.timHandle,STMotorHandle->motorHandler.timChaanel);
 
 	STMotorDeviceControl.FinishCallBack(STMotorHandle);
@@ -164,7 +165,7 @@ uint32_t STMotorMoveStart(STMotorHandle_t* STMotorHandle){
 	STMotorHandle->motorParam.accu = 0;
 	STMotorHandle->motorParam.nStep = 0;
 
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
+//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 
 	if (STMotorHandle->motorParam.endAccel != 0)
 	{
@@ -183,6 +184,7 @@ uint32_t STMotorMoveStart(STMotorHandle_t* STMotorHandle){
 uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
 
 	if(STMotorHandle->motorHandler.isActivate == FALSE){
+		__HAL_TIM_SET_PRESCALER(STMotorHandle->motorHandler.timHandle,1024-1);
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(step == 0){
 			STMotorHandle->motorHandler.isActivate = FALSE;
@@ -208,6 +210,7 @@ uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
 
 uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t timeOut){
 	if(STMotorHandle->motorHandler.isActivate == FALSE){
+		__HAL_TIM_SET_PRESCALER(STMotorHandle->motorHandler.timHandle,1024-1);
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(speed == 0){
 			STMotorHandle->motorHandler.isActivate = FALSE;
@@ -237,9 +240,9 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t ti
 uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,uint16_t speed){
 
 	if(speed == 0){
-		STMotorGoSpeed(STMotorHandle,MOTOR_MIN_SPEED,0);
+		STMotorGoSpeed(STMotorHandle,-STMotorHandle->motorParam.minSpeed,0);
 	}else{
-		STMotorGoSpeed(STMotorHandle,speed,0);
+		STMotorGoSpeed(STMotorHandle,-speed,0);
 	}
 	HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
 	return 0;
@@ -402,8 +405,8 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 		case STATE_HARDSTOP:
 		case STATE_STOP:
 			STMotorHandle->motorParam.curPosition += relStep * ((STMotorHandle->motorParam.direction) ? 1 : -1);
-//			STMotorHandle->motorParam.nStep = 0;
-//			STMotorHandle->motorParam.targetStep = 0;
+			STMotorHandle->motorParam.nStep = 0;
+			STMotorHandle->motorParam.targetStep = 0;
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			STMotorHandle->motorParam.state = STATE_STOP;
 			STMotorStopFreq(STMotorHandle);

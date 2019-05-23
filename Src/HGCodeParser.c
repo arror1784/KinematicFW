@@ -58,9 +58,11 @@ void HGCodeDecodeCommand(void){
 	uint16_t receiveDataSize;
 	int index = rear;
 	int data;
+	char checksum;
+	int transmitErrorFlag = 0;
 	int8_t sign = 1;
 	int j = 0;
-
+	char buff[50] = {0};
 	if( rear < front){
 		receiveDataSize = front - rear;
 	}else if(rear > front){
@@ -69,9 +71,6 @@ void HGCodeDecodeCommand(void){
 		return;
 	}
 
-//	HAL_UART_Transmit(&huart1,"input command low data : ",26,1000);
-//	HAL_UART_Transmit(&huart1,HGCodeBuffer,MAX_HGCODE_BUFFER,1000);
-//	HAL_UART_Transmit(&huart1,"\r\n",2,1000);
 
 	//(index+1) % 배열의 사이즈
 	for(int i = receiveDataSize; i > 0; i--,index = (index + 1) % MAX_HGCODE_BUFFER){
@@ -86,25 +85,30 @@ void HGCodeDecodeCommand(void){
 		switch(HGCodeBuffer[index]){
 			case 'G':
 			case 'H':
+				checksum = 0;
 			case 'A':
 			case 'B':
 			case 'C':
 			case 'P':
 			case 'M':
-			case '*':
+				checksum += HGCodeBuffer[index];
 				data = index;
 				index = (index + 1) % MAX_HGCODE_BUFFER;
 				if(HGCodeBuffer[index]=='-'){
 					sign = -1;
 					i--;
+					checksum += HGCodeBuffer[index];
 					index = (index + 1) % MAX_HGCODE_BUFFER;
+
 				}
-				while(HGCodeBuffer[index] != ' ' && HGCodeBuffer[index] != ';'){
+				while(HGCodeBuffer[index] != ' ' && HGCodeBuffer[index] != ';' ){
 					buff[j] = HGCodeBuffer[index];
 					j++;
+					checksum += HGCodeBuffer[index];
 					index = (index + 1) % MAX_HGCODE_BUFFER;
 					i--;
 				}
+				checksum += HGCodeBuffer[index];
 				switch(HGCodeBuffer[data]){
 				case 'G':
 					HGCodePutData(HGCodeCharToInt(buff,j) * sign,HGCODE_G);
@@ -128,16 +132,34 @@ void HGCodeDecodeCommand(void){
 					HGCodePutData(HGCodeCharToDouble(buff,j) * sign,HGCODE_M);
 					break;
 				case '*':
-					HGCodePutData(HGCodeCharToDouble(buff,j) * sign,HGCODE_CHECKSUM);
+//					HGCodePutData(HGCodeCharToDouble(buff,j) * sign,HGCODE_CHECKSUM);
 					break;
 				}
 				j=0;
 				sign = 1;
 				break;
+			case '*':
+				index = (index + 1) % MAX_HGCODE_BUFFER;
+				if(checksum == HGCodeBuffer[index]){
+//					HAL_UART_Transmit(&huart1,"transmit sucess\r\n",17,1000);
+					index = (index + 1) % MAX_HGCODE_BUFFER;
+				}else{
+					HAL_UART_Transmit_IT(&huart1,"transmit error\r\n",16);
+					HAL_UART_Transmit_IT(&huart2,"transmit error",16);
+					while(HGCodeBuffer[index] != ';'){
+						index = (index + 1) % MAX_HGCODE_BUFFER;
+					}
+					transmitErrorFlag = 1;
+				}
+				break;
 			default:
 				break;
 		}
-		if(HGCodeBuffer[index] == ';'){
+		if(transmitErrorFlag == 1){
+			transmitErrorFlag = 0;
+			index = (index + 1) % MAX_HGCODE_BUFFER;
+			break;
+		}else if(HGCodeBuffer[index] == ';'){
 			HGCodeControl.commandCount++;
 			HGCodeControl.dataFront = (HGCodeControl.dataFront + 1) % MAX_COMMAND;
 			index = (index + 1) % MAX_HGCODE_BUFFER;

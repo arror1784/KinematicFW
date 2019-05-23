@@ -87,10 +87,11 @@ void EXTInterruptHandle(uint16_t GPIO_Pin){
 	switch(GPIO_Pin){
 	case MOTOR_1_ENDSTOP_PIN:
 		STMotorEXTInterruptHandle(&STMotorDevices[0]);
-		HAL_UART_Transmit_IT(&huart2,"end stop interrupt\r\n",40);
+		HAL_UART_Transmit_IT(&huart1,"end stop interrupt\r\n",40);
 		break;
 	case POWER_BTN_Pin:
-		HAL_UART_Transmit_IT(&huart2,"FRNT BTN interrupt\r\n",40);
+		HAL_UART_Transmit(&huart2,"print start",11,1000);
+		HAL_UART_Transmit(&huart1,"FRNT BTN interrupt\r\n",40,1000);
 		break;
 	}
 }

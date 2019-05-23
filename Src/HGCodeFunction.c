@@ -31,8 +31,8 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 	STMotorInitParam(&STMotorDevices[0],400,400,MAX_SPEED,MIN_SPEED);
 //	STMotorInitParam(&STMotorDevices[0],0,0,0,0);
 
-//	setNeoPixel(neoPixel_P,&htim1,TIM_CHANNEL_1,&hdma_tim1_ch4_trig_com,10);
-//	setColorBlack(neoPixel_P);
+	setNeoPixel(neoPixel_P,&htim1,TIM_CHANNEL_4,&hdma_tim1_ch4_trig_com,10);
+	setColorBlack(neoPixel_P);
 
 	while(1){
 		if(HGCodeCheckDataBuffer() == 1){
@@ -40,7 +40,7 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 
 			sprintf(buff,"command count: %4d, G: %4d, H: %4d, A: %4.3lf\r\n",
 					commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,temp->HGCodeParameter.A);
-			HAL_UART_Transmit(&huart1,buff,100,1000);
+			HAL_UART_Transmit_IT(&huart1,buff,100);
 
 			if(temp->HGCodeCommand.G != 0){
 				switch(temp->HGCodeCommand.G){
@@ -95,7 +95,7 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 					H43();
 					break;
 				case 50:
-//					H50();
+					H50();
 					break;
 				case 100:
 					H100();
@@ -153,8 +153,11 @@ void G27(){
 //	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G27 OK",6);
 }
 void G28(){
-	STMotorGoMilli(&STMotorDevices[0],5);
-//	STMotorAutoHome(&STMotorDevices[0],0);
+//	STMotorGoMilli(&STMotorDevices[0],5);
+	if(temp->HGCodeParameter.A == 0)
+		STMotorAutoHome(&STMotorDevices[0],0);
+	else
+		STMotorAutoHome(&STMotorDevices[0],(int)temp->HGCodeParameter.A);
 //	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
 }
 void G30(){
@@ -283,10 +286,12 @@ void H43(){
 	}
 }
 void H50(){
-	for(int i = 0 ; i < neoPixel_P->ledCount; i++){
-		setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
+	if(STMotorIsActivate(&STMotorDevices[0]) == 0){
+		for(int i = 0 ; i < neoPixel_P->ledCount; i++){
+			setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
+		}
+		updateColor(neoPixel_P);
 	}
-	updateColor(neoPixel_P);
 }
 void H60(){
 	uint8_t buff[50] = {0};

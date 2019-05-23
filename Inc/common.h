@@ -54,7 +54,7 @@
 
 #define MOTOR_PRESCALER					1024
 #define MOTOR_MAX_SPEED					0
-#define MOTOR_MIN_SPEED					0//3200
+#define MOTOR_MIN_SPEED					3200
 #define MOTOR_ACCEL 					0
 #define MOTOR_DECEL						0
 #define MOTOR_MOTOR_STEP				200
