@@ -29,10 +29,27 @@ typedef struct {
 	int16_t G;
 	int16_t H;
 
-	//double G;
-	//double H;
-
 }HGCodeCommand_t;
+
+typedef union{
+
+    float db;
+    char ch[4];
+
+}double2char;
+
+typedef struct{
+
+    uint8_t G;
+    uint8_t H;
+    double2char A;
+    double2char B;
+    double2char C;
+    double2char M;
+    double2char P;
+    double2char CheckSum;
+
+}commandFormat_t,*commandFormat_P;
 
 typedef struct {
 
@@ -69,6 +86,7 @@ typedef struct{
 	DMA_HandleTypeDef* HGCodeDmaHandle;
 	HGCodeBufferControl_t HGCodeBufferControl;
 	HGCodeDataControl_t HGCodeDataControl[MAX_COMMAND];
+//	commandFormat_t HGCodeDataControl[MAX_COMMAND];
 
 	uint8_t commandCount;
 	uint8_t dataFront;

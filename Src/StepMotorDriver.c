@@ -55,10 +55,26 @@ void SetEnableIRQ(STMotorHandle_t *STMotorHandle,bool flag){
 
 
 void FinishCallBack(STMotorHandle_t *STMotorHandle){
+	uint8_t response[15];
+	uint8_t buff[50] = {0};
+	response[0] = 0x02;
+	response[1] = 'M';
+	response[2] = 'O';
+	response[3] = 'V';
+	response[4] = 'E';
+	response[5] = ' ';
+	response[6] = 'A';
+	response[7] = ' ';
+	response[8] = 'O';
+	response[9] = 'K';
+	response[10] = 0x52;
+	response[11] = 0x03;
 
 	switch(STMotorHandle->motorHandler.deviceNumber){
 		case 0x00:
-			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE A OK",9);
+			HAL_UART_Transmit_IT(&huart2,response,12);
+			sprintf(buff,"current position %ld\r\n",STMotorHandle->motorParam.curPosition);
+			HAL_UART_Transmit(&huart1,(uint8_t*)buff,40,1000);
 			break;
 		case 0x01:
 			HAL_UART_Transmit_IT(&huart2,(uint8_t*)"MOVE B OK",9);
@@ -84,13 +100,24 @@ void PWMPulseInterruptHandle(TIM_HandleTypeDef *htim){
 }
 
 void EXTInterruptHandle(uint16_t GPIO_Pin){
+
+	uint8_t response[9];
+	response[0] = 0x02;
+	response[1] = 's';
+	response[2] = 't';
+	response[3] = 'a';
+	response[4] = 'r';
+	response[5] = 't';
+	response[6] = 0x2E;
+	response[7] = 0x03;
+
 	switch(GPIO_Pin){
 	case MOTOR_1_ENDSTOP_PIN:
 		STMotorEXTInterruptHandle(&STMotorDevices[0]);
 		HAL_UART_Transmit_IT(&huart1,"end stop interrupt\r\n",40);
 		break;
 	case POWER_BTN_Pin:
-		HAL_UART_Transmit(&huart2,"print start",11,1000);
+		HAL_UART_Transmit(&huart2,response,8,1000);
 		HAL_UART_Transmit(&huart1,"FRNT BTN interrupt\r\n",40,1000);
 		break;
 	}

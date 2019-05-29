@@ -26,7 +26,7 @@ void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeD
 	HGCodeControl.dataRear = 0;
 	HGCodeControl.dataFront = 0;
 
-	memset(HGCodeControl.HGCodeDataControl,0x00,sizeof(HGCodeDataControl_t)*MAX_COMMAND);
+	memset(HGCodeControl.HGCodeDataControl,0x00,sizeof(commandFormat_t)*MAX_COMMAND);
 }
 
 	//void HGCodeDMASetBuffer(int8_t *,uint16_t);
@@ -58,11 +58,22 @@ void HGCodeDecodeCommand(void){
 	uint16_t receiveDataSize;
 	int index = rear;
 	int data;
-	char checksum;
+	uint8_t checksum = 0;
 	int transmitErrorFlag = 0;
 	int8_t sign = 1;
 	int j = 0;
 	char buff[50] = {0};
+	commandFormat_t temp = {0};
+	uint8_t response[9];
+	response[0] = 0x02;
+	response[1] = 'a';
+	response[2] = 'r';
+	response[3] = 'r';
+	response[4] = 'o';
+	response[5] = 'r';
+	response[6] = 0x26;
+	response[7] = 0x03;
+
 	if( rear < front){
 		receiveDataSize = front - rear;
 	}else if(rear > front){
@@ -70,9 +81,87 @@ void HGCodeDecodeCommand(void){
 	}else{
 		return;
 	}
+//	HGCodeControl.HGCodeDataControl[HGCodeControl.dataFront].
+	if(receiveDataSize < 25){
+		return;
+	}else{
+		for(int i = receiveDataSize; i > 0; i--,index = (index + 1) % MAX_HGCODE_BUFFER){
+			if(HGCodeBuffer[index] == 0x02 && HGCodeBuffer[(index + 24) % MAX_HGCODE_BUFFER] == 0x03){
+				checksum = 0;
+				for(int j = 1; j < 23; j++){
+					checksum += HGCodeBuffer[(index + j) % MAX_HGCODE_BUFFER];
+				}
+				if(checksum != HGCodeBuffer[(index + 23) % MAX_HGCODE_BUFFER]){
+					HAL_UART_Transmit_IT(&huart1,"transmit error\r\n",16);
+					HAL_UART_Transmit_IT(&huart2,response,8);
+//					index = (index + 25) % MAX_HGCODE_BUFFER;
+					break;
+				}
+				temp.G = HGCodeBuffer[(index + 1) % MAX_HGCODE_BUFFER];
+				temp.H = HGCodeBuffer[(index + 2) % MAX_HGCODE_BUFFER];
 
+				temp.A.ch[0] = HGCodeBuffer[(index + 3) % MAX_HGCODE_BUFFER];
+				temp.A.ch[1] = HGCodeBuffer[(index + 4) % MAX_HGCODE_BUFFER];
+				temp.A.ch[2] = HGCodeBuffer[(index + 5) % MAX_HGCODE_BUFFER];
+				temp.A.ch[3] = HGCodeBuffer[(index + 6) % MAX_HGCODE_BUFFER];
+//				temp.A.ch[4] = HGCodeBuffer[(index + 7) % MAX_HGCODE_BUFFER];
+//				temp.A.ch[5] = HGCodeBuffer[(index + 8) % MAX_HGCODE_BUFFER];
+//				temp.A.ch[6] = HGCodeBuffer[(index + 9) % MAX_HGCODE_BUFFER];
+//				temp.A.ch[7] = HGCodeBuffer[(index + 10) % MAX_HGCODE_BUFFER];
 
-	//(index+1) % ¹è¿­ÀÇ »çÀÌÁî
+				temp.B.ch[0] = HGCodeBuffer[(index + 7) % MAX_HGCODE_BUFFER];
+				temp.B.ch[1] = HGCodeBuffer[(index + 8) % MAX_HGCODE_BUFFER];
+				temp.B.ch[2] = HGCodeBuffer[(index + 9) % MAX_HGCODE_BUFFER];
+				temp.B.ch[3] = HGCodeBuffer[(index + 10) % MAX_HGCODE_BUFFER];
+//				temp.B.ch[4] = HGCodeBuffer[(index + 15) % MAX_HGCODE_BUFFER];
+//				temp.B.ch[5] = HGCodeBuffer[(index + 16) % MAX_HGCODE_BUFFER];
+//				temp.B.ch[6] = HGCodeBuffer[(index + 17) % MAX_HGCODE_BUFFER];
+//				temp.B.ch[7] = HGCodeBuffer[(index + 18) % MAX_HGCODE_BUFFER];
+
+				temp.C.ch[0] = HGCodeBuffer[(index + 11) % MAX_HGCODE_BUFFER];
+				temp.C.ch[1] = HGCodeBuffer[(index + 12) % MAX_HGCODE_BUFFER];
+				temp.C.ch[2] = HGCodeBuffer[(index + 13) % MAX_HGCODE_BUFFER];
+				temp.C.ch[3] = HGCodeBuffer[(index + 14) % MAX_HGCODE_BUFFER];
+//				temp.C.ch[4] = HGCodeBuffer[(index + 23) % MAX_HGCODE_BUFFER];
+//				temp.C.ch[5] = HGCodeBuffer[(index + 24) % MAX_HGCODE_BUFFER];
+//				temp.C.ch[6] = HGCodeBuffer[(index + 25) % MAX_HGCODE_BUFFER];
+//				temp.C.ch[7] = HGCodeBuffer[(index + 26) % MAX_HGCODE_BUFFER];
+
+				temp.M.ch[0] = HGCodeBuffer[(index + 15) % MAX_HGCODE_BUFFER];
+				temp.M.ch[1] = HGCodeBuffer[(index + 16) % MAX_HGCODE_BUFFER];
+				temp.M.ch[2] = HGCodeBuffer[(index + 17) % MAX_HGCODE_BUFFER];
+				temp.M.ch[3] = HGCodeBuffer[(index + 18) % MAX_HGCODE_BUFFER];
+//				temp.M.ch[4] = HGCodeBuffer[(index + 31) % MAX_HGCODE_BUFFER];
+//				temp.M.ch[5] = HGCodeBuffer[(index + 32) % MAX_HGCODE_BUFFER];
+//				temp.M.ch[6] = HGCodeBuffer[(index + 33) % MAX_HGCODE_BUFFER];
+//				temp.M.ch[7] = HGCodeBuffer[(index + 34) % MAX_HGCODE_BUFFER];
+
+				temp.P.ch[0] = HGCodeBuffer[(index + 19) % MAX_HGCODE_BUFFER];
+				temp.P.ch[1] = HGCodeBuffer[(index + 20) % MAX_HGCODE_BUFFER];
+				temp.P.ch[2] = HGCodeBuffer[(index + 21) % MAX_HGCODE_BUFFER];
+				temp.P.ch[3] = HGCodeBuffer[(index + 22) % MAX_HGCODE_BUFFER];
+//				temp.P.ch[4] = HGCodeBuffer[(index + 39) % MAX_HGCODE_BUFFER];
+//				temp.P.ch[5] = HGCodeBuffer[(index + 40) % MAX_HGCODE_BUFFER];
+//				temp.P.ch[6] = HGCodeBuffer[(index + 41) % MAX_HGCODE_BUFFER];
+//				temp.P.ch[7] = HGCodeBuffer[(index + 42) % MAX_HGCODE_BUFFER];
+
+				HGCodePutData(temp.G,HGCODE_G);
+				HGCodePutData(temp.H,HGCODE_H);
+				HGCodePutData((double)temp.A.db,HGCODE_A);
+				HGCodePutData((double)temp.B.db,HGCODE_B);
+				HGCodePutData((double)temp.C.db,HGCODE_C);
+				HGCodePutData((double)temp.M.db,HGCODE_M);
+				HGCodePutData((double)temp.P.db,HGCODE_P);
+
+				HGCodeControl.dataFront = (HGCodeControl.dataFront + 1) % MAX_COMMAND;
+				HGCodeControl.commandCount++;
+				break;
+			}
+		}
+		HGCodeControl.HGCodeBufferControl.rear = (index + 25) % MAX_HGCODE_BUFFER;
+	}
+	/*
+	//(index+1) % ë°°ì—´ì˜ ì‚¬ì´ì¦ˆ
 	for(int i = receiveDataSize; i > 0; i--,index = (index + 1) % MAX_HGCODE_BUFFER){
 
 		if(HGCodeBuffer[index] == ';'){
@@ -167,6 +256,7 @@ void HGCodeDecodeCommand(void){
 		}
 	}
 	HGCodeControl.HGCodeBufferControl.rear = index;
+	*/
 }
 
 uint16_t HGCodeGetCommandCount (void){
@@ -217,35 +307,35 @@ void HGCodePutData(double data, uint8_t flag){
 		break;
 	}
 }
-
-int16_t HGCodeCharToInt(uint8_t* buff, int size){
-	int16_t value = 0;
-	int a = 1;
-	for(int i = size - 1;i >= 0;i--){
-		value += (buff[i] - 0x30) * a;
-		a*=10;
-	}
-	return value;
-}
-
-double HGCodeCharToDouble(uint8_t* buff ,int size){
-	double value = 0.0;
-	int a = 1;
-	double b = 1;
-	for(int i = size - 1;i >= 0;i--){
-		if(buff[i] == '.'){
-			for(int j = 0; j < size - 1 - i ;j++){
-				b *= 0.1;
-			}
-			value = value * b;
-			a = 1;
-		}else{
-			value += (buff[i] - 0x30) * a;
-			a*=10;
-		}
-	}
-	return value;
-}
+//
+//int16_t HGCodeCharToInt(uint8_t* buff, int size){
+//	int16_t value = 0;
+//	int a = 1;
+//	for(int i = size - 1;i >= 0;i--){
+//		value += (buff[i] - 0x30) * a;
+//		a*=10;
+//	}
+//	return value;
+//}
+//
+//double HGCodeCharToDouble(uint8_t* buff ,int size){
+//	double value = 0.0;
+//	int a = 1;
+//	double b = 1;
+//	for(int i = size - 1;i >= 0;i--){
+//		if(buff[i] == '.'){
+//			for(int j = 0; j < size - 1 - i ;j++){
+//				b *= 0.1;
+//			}
+//			value = value * b;
+//			a = 1;
+//		}else{
+//			value += (buff[i] - 0x30) * a;
+//			a*=10;
+//		}
+//	}
+//	return value;
+//}
 
 void DecodeTimerInterruptHandler(void){
 	if(HGCodeCheckCommandBuffer() == 1){

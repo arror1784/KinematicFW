@@ -49,7 +49,7 @@
 #define MOTOR_DRIVER_MIN_STEP_DELAY		1
 #define MOTOR_DRIVER_MiCRO_STEP			(uint32_t)16
 #define MOTOR_STEP						(uint32_t)200
-#define MOTOR_SCREW_PITCH				8
+#define MOTOR_SCREW_PITCH				2
 #define MOTOR_SCREW_LENGHT				500 // unit : mm
 
 #define MOTOR_PRESCALER					1024
@@ -70,7 +70,8 @@ typedef enum{
 	STATE_STOP = 3,
 	STATE_SOFTSTOP = 4,
 	STATE_HARDSTOP = 5,
-	STATE_INFINITE = 6
+	STATE_INFINITE = 6,
+	STATE_FINISH_AUTO_HOME = 7
 
 }MotorState_t;
 
@@ -89,6 +90,8 @@ typedef struct{
 	TIM_TypeDef* instance;
 	HAL_TIM_ActiveChannel timChaanel;
 	IRQn_Type IRQn;
+	GPIO_TypeDef* port;
+	uint16_t pin;
 	volatile bool isActivate;
 
 	volatile uint32_t timPrescaler;
