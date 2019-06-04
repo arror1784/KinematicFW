@@ -12,7 +12,7 @@
 #include <stm32f4xx_hal.h>
 #include <usart.h>
 
-#define MAX_HGCODE_BUFFER 200
+#define MAX_HGCODE_BUFFER 500
 #define MAX_COMMAND 10
 
 #define HGCODE_G		0
@@ -33,8 +33,8 @@ typedef struct {
 
 typedef union{
 
-    float db;
-    char ch[4];
+    double db;
+    char ch[8];
 
 }double2char;
 
@@ -65,10 +65,10 @@ typedef struct {
 typedef struct{
 
 	uint8_t* GHCodeHuffer;
-	uint16_t bufferSize;
+	uint32_t bufferSize;
 
-	uint8_t front;
-	uint8_t rear;
+	uint32_t front;
+	uint32_t rear;
 
 }HGCodeBufferControl_t;
 
@@ -76,7 +76,6 @@ typedef struct{
 
 	HGCodeCommand_t HGCodeCommand;
 	HGCodeParameter_t HGCodeParameter;
-
 
 }HGCodeDataControl_t;
 
@@ -135,7 +134,8 @@ uint16_t HGCodeGetCommandCount(void);
 
 HGCodeDataControl_t* HGCodeGetCommandData(void);
 
-void HGCodePutData(double, uint8_t);
+void HGCodePutMainCommand(uint8_t,uint8_t);
+void HGCodePutSubCommand(double, uint8_t);
 
 double HGCodeCharToDouble(uint8_t* ,int size);
 int16_t HGCodeCharToInt(uint8_t* ,int size);

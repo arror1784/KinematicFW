@@ -21,26 +21,24 @@ P_WS2812BControl_t neoPixel_P = &neoPixel;
 
 void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 
-	uint8_t buff[200] = {0};
+	uint8_t buff[100] = {0};
 
 	HGCodeInit(HGCodeUsartHandle,HGCodeDmaHandle);
 	HGCodeDMAStart();
 	HAL_TIM_Base_Start_IT(timHandler);
 
-	STMotorInitHandler(&STMotorDevices[0],&htim1,TIM_CHANNEL_1,EXTI9_5_IRQn);
+	STMotorInitHandler(&STMotorDevices[0],&htim9,TIM_CHANNEL_1,EXTI9_5_IRQn);
 	STMotorInitParam(&STMotorDevices[0],400,400,MAX_SPEED,MIN_SPEED);
-//	STMotorInitParam(&STMotorDevices[0],0,0,0,0);
 
 	setNeoPixel(neoPixel_P,&htim1,TIM_CHANNEL_4,&hdma_tim1_ch4_trig_com,10);
-	setColorBlack(neoPixel_P);
 
 	while(1){
 		if(HGCodeCheckDataBuffer() == 1){
 			temp = HGCodeGetCommandData();
 
-			sprintf(buff,"command count: %4d, G: %4d, H: %4d, A: %4.3lf\r\n",
+			sprintf(buff,"command count: %4d, G: %4d, H: %4d, A: %lf\r\n",
 					commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,temp->HGCodeParameter.A);
-			HAL_UART_Transmit(&huart1,buff,100,1000);
+			HAL_UART_Transmit_IT(&huart1,buff,strlen(buff));
 
 			if(temp->HGCodeCommand.G != 0){
 				switch(temp->HGCodeCommand.G){
@@ -166,11 +164,15 @@ void G27(){
 }
 void G28(){
 //	STMotorGoMilli(&STMotorDevices[0],5);
-	if(temp->HGCodeParameter.A == 0)
-		STMotorAutoHome(&STMotorDevices[0],0);
-	else
-		STMotorAutoHome(&STMotorDevices[0],(int)temp->HGCodeParameter.A);
-//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
+	if(!STMotorIsActivate(&STMotorDevices[0])){
+		if(temp->HGCodeParameter.A == 0)
+			STMotorAutoHome(&STMotorDevices[0],0);
+		else
+			STMotorAutoHome(&STMotorDevices[0],(int32_t)((temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH / ((double)MOTOR_DRIVER_MiCRO_STEP * (double)MOTOR_STEP))));
+	}else
+		while(HAL_UART_Transmit_IT(&huart1,"is activate\r\n",13) != HAL_OK);
+//		HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"MOVE A OK",9);
+//		HAL_UART_Transmit_IT(&huart1,"is activate\r\n",13);
 }
 void G30(){
 	return;
@@ -313,12 +315,10 @@ void H43(){
 //}
 
 void H50(){
-	if(STMotorIsActivate(&STMotorDevices[0]) == 0){
-		for(int i = 0 ; i < neoPixel_P->ledCount; i++){
-			setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
-		}
-		updateColor(neoPixel_P);
+	for(int i = 0 ; i < neoPixel_P->ledCount; i++){
+		setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
 	}
+	updateColor(neoPixel_P);
 }
 void H60(){
 	uint8_t buff[50] = {0};
@@ -326,7 +326,15 @@ void H60(){
 	HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
 }
 void H100(){
+	uint8_t buff[6];
+	buff[0] = 0x02;
+	buff[1] = 'O';
+	buff[2] = 'K';
+	buff[3] = 0x9A;
+	buff[4] = 0x03;
+
 	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
-	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H100 OK",7);
+	while(HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,buff,5) != HAL_OK);
+	HAL_UART_Transmit_IT(&huart1,(uint8_t*)"H100 OK\r\n",9);
 }
 

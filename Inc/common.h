@@ -52,7 +52,7 @@
 #define MOTOR_SCREW_PITCH				2
 #define MOTOR_SCREW_LENGHT				500 // unit : mm
 
-#define MOTOR_PRESCALER					1024
+#define MOTOR_PRESCALER					1024-1
 #define MOTOR_MAX_SPEED					0
 #define MOTOR_MIN_SPEED					3200
 #define MOTOR_ACCEL 					0

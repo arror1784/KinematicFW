@@ -6,9 +6,12 @@
  */
 #include "neoPixel.h"
 
+uint32_t buf[4*24*12] = {0};
+
 void setNeoPixel(WS2812BControl_t *WS2812BControl,TIM_HandleTypeDef* timerControl,uint32_t channel,DMA_HandleTypeDef* timerDMAControl,uint16_t ledCount){
-	WS2812BControl->bitBuff = (uint32_t*)malloc(sizeof(uint32_t) * 24 * (ledCount + 4));
-	memset(WS2812BControl->bitBuff,0x00,sizeof(uint32_t) * 24 * (ledCount + 4));
+	WS2812BControl->bitBuff = (uint32_t*)malloc(sizeof(uint32_t) * 24 * (ledCount + 2));
+	memset(WS2812BControl->bitBuff,0x00,sizeof(uint32_t) * 24 * (ledCount + 2));
+//	WS2812BControl->bitBuff = buf;
 //	WS2812BControl->bitBuff = bitBuff;
 	WS2812BControl->timerControl = timerControl;
 	WS2812BControl->channel = channel;
@@ -21,24 +24,24 @@ uint32_t converColorTo32(uint8_t green,uint8_t red,uint8_t blue){
 }
 void setColor(WS2812BControl_t *WS2812BControl, uint32_t color, uint16_t ledNo){
 	for(int i=0; i<24; i++){
-		if(color&(1<<(23-i))) WS2812BControl->bitBuff[ledNo*24 + i + 48] = 16;
-	    else                  WS2812BControl->bitBuff[ledNo*24 + i + 48] = 8 ;
+		if(color&(1<<(23-i))) WS2812BControl->bitBuff[ledNo*24 + i + 24] = 16;
+	    else                  WS2812BControl->bitBuff[ledNo*24 + i + 24] = 8 ;
 	}
 }
 void setColorBlack(WS2812BControl_t *WS2812BControl){
 	for(int i = 0 ; i < WS2812BControl->ledCount; i++){
-		setColor(WS2812BControl,converColorTo32(0,0,0),i);
+		setColor(WS2812BControl,converColorTo32((uint8_t)0x00,(uint8_t)0x00,(uint8_t)0x00),i);
 	}
 	updateColor(WS2812BControl);
 }
 void updateColor(WS2812BControl_t *WS2812BControl){
-
-	__HAL_TIM_SET_PRESCALER(WS2812BControl->timerControl,4);
-	__HAL_TIM_SET_AUTORELOAD(WS2812BControl->timerControl, 24);
+//
+//	__HAL_TIM_SET_PRESCALER(WS2812BControl->timerControl,4);
+//	__HAL_TIM_SET_AUTORELOAD(WS2812BControl->timerControl, 24);
 
 	HAL_TIM_PWM_Stop_DMA(WS2812BControl->timerControl,WS2812BControl->channel);
 //	HAL_TIM_PWM_Start_DMA(WS2812BControl->timerControl,WS2812BControl->channel,WS2812BControl->bitBuff,WS2812BControl->ledCount * 24 + 24);
-	HAL_TIM_PWM_Start_DMA(WS2812BControl->timerControl,TIM_CHANNEL_4,WS2812BControl->bitBuff,(WS2812BControl->ledCount * 24) + 96);
+	HAL_TIM_PWM_Start_DMA(WS2812BControl->timerControl,TIM_CHANNEL_4,WS2812BControl->bitBuff,(WS2812BControl->ledCount * 24) + 48);
 	while(getNDTR(WS2812BControl) > 0);
 	HAL_TIM_PWM_Stop_DMA(WS2812BControl->timerControl,WS2812BControl->channel);
 

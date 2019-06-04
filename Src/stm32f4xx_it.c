@@ -51,7 +51,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
- 
+#define DEBOUNCING_TIME 250
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,6 +62,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 extern P_WS2812BControl_t neoPixel_P;
+uint32_t frt_before_time = 0;
+uint32_t end_before_time = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -79,6 +81,7 @@ extern DMA_HandleTypeDef hdma_tim1_ch4_trig_com;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim6;
+extern TIM_HandleTypeDef htim9;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
@@ -228,8 +231,11 @@ void SysTick_Handler(void)
 void EXTI3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI3_IRQn 0 */
-//	HAL_UART_Transmit_IT(&huart2,"end stop interrupt\r\n",40);
-
+	HAL_UART_Transmit_IT(&huart1,"FRT BTN interrupt\r\n",40);
+	if(HAL_GetTick() - frt_before_time >= DEBOUNCING_TIME ){
+		frt_before_time  = HAL_GetTick();
+		EXTInterruptHandle(POWER_BTN_Pin);
+	}
   /* USER CODE END EXTI3_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
   /* USER CODE BEGIN EXTI3_IRQn 1 */
@@ -261,7 +267,10 @@ void EXTI9_5_IRQHandler(void)
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
-
+//	if(HAL_GetTick() - end_before_time >= DEBOUNCING_TIME ){
+//		end_before_time  = HAL_GetTick();
+//		EXTInterruptHandle(MOTOR_1_ENDSTOP_PIN);
+//	}
   /* USER CODE END EXTI9_5_IRQn 1 */
 }
 
@@ -274,6 +283,7 @@ void TIM1_BRK_TIM9_IRQHandler(void)
 
   /* USER CODE END TIM1_BRK_TIM9_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
+  HAL_TIM_IRQHandler(&htim9);
   /* USER CODE BEGIN TIM1_BRK_TIM9_IRQn 1 */
 
   /* USER CODE END TIM1_BRK_TIM9_IRQn 1 */

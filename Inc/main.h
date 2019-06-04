@@ -82,8 +82,6 @@ void Error_Handler(void);
 #define POWER_BTN_Pin GPIO_PIN_3
 #define POWER_BTN_GPIO_Port GPIOC
 #define POWER_BTN_EXTI_IRQn EXTI3_IRQn
-#define MOTOR_STEP_1_Pin GPIO_PIN_0
-#define MOTOR_STEP_1_GPIO_Port GPIOA
 #define UV_LED_Pin GPIO_PIN_15
 #define UV_LED_GPIO_Port GPIOB
 #define MOTOR_ENDBTN_1_Pin GPIO_PIN_7
@@ -93,8 +91,6 @@ void Error_Handler(void);
 #define MOTOR_EN_1_GPIO_Port GPIOC
 #define MOTOR_DIR_1_Pin GPIO_PIN_9
 #define MOTOR_DIR_1_GPIO_Port GPIOC
-#define MOTOR_STEP_Pin GPIO_PIN_8
-#define MOTOR_STEP_GPIO_Port GPIOA
 #define FRT_LED_Pin GPIO_PIN_11
 #define FRT_LED_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */

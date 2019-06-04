@@ -53,9 +53,9 @@ uint32_t STMotorGoRotation(STMotorHandle_t* STMotorHandle,double rotation);
 uint32_t STMotorHardStop(STMotorHandle_t* STMotorHandle);
 uint32_t STMotorSoftStop(STMotorHandle_t* STMotorHandle);
 
-uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t timeOut);
+uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int32_t speed,uint16_t timeOut);
 
-uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,uint16_t speed);
+uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,int32_t speed);
 
 uint32_t STMotorWaitingActivate(STMotorHandle_t* STMotorHandle,uint32_t timeOut);
 uint8_t STMotorIsActivate(STMotorHandle_t* STMotorHandle);

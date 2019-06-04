@@ -116,10 +116,10 @@ void EXTInterruptHandle(uint16_t GPIO_Pin){
 		STMotorEXTInterruptHandle(&STMotorDevices[0]);
 		HAL_UART_Transmit_IT(&huart1,"end stop interrupt\r\n",40);
 		break;
-	case POWER_BTN_Pin:
-		HAL_UART_Transmit(&huart2,response,8,1000);
-		HAL_UART_Transmit(&huart1,"FRNT BTN interrupt\r\n",40,1000);
-		break;
+//	case POWER_BTN_Pin:
+//		HAL_UART_Transmit(&huart2,response,8,1000);
+//		HAL_UART_Transmit(&huart1,"FRNT BTN interrupt\r\n",40,1000);
+//		break;
 	}
 }
 

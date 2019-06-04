@@ -124,6 +124,7 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C2_Init();
   MX_TIM1_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
 //  HAL_UART_Transmit_IT(&huart2,"hello",5);
 //  HAL_UART_Transmit_IT(&huart1,"program start \r\n",100);

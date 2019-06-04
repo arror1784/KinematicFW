@@ -36,7 +36,6 @@ bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handl
 
 	HAL_NVIC_DisableIRQ(STMotorHandle->motorHandler.IRQn);
 
-//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
 	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 	return TRUE;
 }
@@ -155,7 +154,6 @@ uint32_t STMotorSetFreq(STMotorHandle_t* STMotorHandle,uint32_t freq){
 }
 
 uint32_t STMotorStopFreq(STMotorHandle_t* STMotorHandle){
-//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
 	HAL_TIM_PWM_Stop_IT(STMotorHandle->motorHandler.timHandle,STMotorHandle->motorHandler.timChaanel);
 
 	STMotorDeviceControl.FinishCallBack(STMotorHandle);
@@ -167,14 +165,10 @@ uint32_t STMotorMoveStart(STMotorHandle_t* STMotorHandle){
 	STMotorHandle->motorParam.accu = 0;
 	STMotorHandle->motorParam.nStep = 0;
 
-//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
-
 	if (STMotorHandle->motorParam.endAccel != 0)
 	{
 		STMotorHandle->motorParam.state = STATE_ACCEL;
-	}
-	else
-	{
+	}else{
 		STMotorHandle->motorParam.state = STATE_DECEL;
 	}
 
@@ -186,7 +180,6 @@ uint32_t STMotorMoveStart(STMotorHandle_t* STMotorHandle){
 uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
 
 	if(STMotorHandle->motorHandler.isActivate == FALSE){
-		__HAL_TIM_SET_PRESCALER(STMotorHandle->motorHandler.timHandle,1024-1);
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(step == 0){
 			STMotorHandle->motorHandler.isActivate = FALSE;
@@ -210,17 +203,15 @@ uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
 	}
 }
 
-uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t timeOut){
+uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int32_t speed,uint16_t timeOut){
+
 	if(STMotorHandle->motorHandler.isActivate == FALSE){
-		__HAL_TIM_SET_PRESCALER(STMotorHandle->motorHandler.timHandle,1024-1);
-		HAL_Delay(50);
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(speed == 0){
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			return 0;
 		}else if(speed < 0) {
 			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_BACKWORD);
-
 		}else{
 			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_FORWORD);
 		}
@@ -231,32 +222,35 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int16_t speed,uint16_t ti
 		STMotorHandle->motorParam.nStep = 0;
 
 		STMotorHandle->motorParam.state = STATE_INFINITE;
-
-		STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 		STMotorSetFreq(STMotorHandle,abs(speed));
 		return 0;
 	}else{
-		return -1;
-	}
-}
-
-uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,uint16_t speed){
-	if(HAL_GPIO_ReadPin(STMotorHandle->motorHandler.port,STMotorHandle->motorHandler.pin)){
-//		HAL_NVIC_ClearPendingIRQ(STMotorHandle->motorHandler.IRQn);
-		__HAL_GPIO_EXTI_CLEAR_IT(STMotorHandle->motorHandler.pin);
-  		if(speed == 0){
-			STMotorGoSpeed(STMotorHandle,-STMotorHandle->motorParam.minSpeed,0);
-		}else{
-			STMotorGoSpeed(STMotorHandle,-speed,0);
-		}
-		HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
-//		HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
-
-		return 0;
-	}else{
-		STMotorDeviceControl.FinishCallBack(STMotorHandle);
 		return 1;
 	}
+
+}
+
+uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,int32_t speed){
+	if(STMotorHandle->motorHandler.isActivate == FALSE){
+		HAL_Delay(50);
+		if(HAL_GPIO_ReadPin(STMotorHandle->motorHandler.port,STMotorHandle->motorHandler.pin)){
+			__HAL_GPIO_EXTI_CLEAR_IT(STMotorHandle->motorHandler.pin);
+			if(speed == 0){
+				STMotorGoSpeed(STMotorHandle,STMotorHandle->motorParam.minSpeed,0);
+			}else{
+				STMotorGoSpeed(STMotorHandle,speed,0);
+			}
+			HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
+			return 0;
+		}else{
+			STMotorDeviceControl.FinishCallBack(STMotorHandle);
+			return 1;
+		}
+	}else{
+		HAL_UART_Transmit(&huart1,"is activate\r\n",13,1000);
+		return 2;
+	}
+
 }
 
 uint32_t STMotorGoMilli(STMotorHandle_t* STMotorHandle,double milli){
