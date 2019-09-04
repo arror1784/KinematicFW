@@ -1,0 +1,11 @@
+neoPixel.c:14:6:setNeoPixel	32	static
+neoPixel.c:24:10:converColorTo32	0	static
+neoPixel.c:27:6:setColor	20	static
+neoPixel.c:33:6:setColorArr	16	static
+neoPixel.c:45:6:updateColor	8	static
+neoPixel.c:39:6:setColorBlack	16	static
+neoPixel.c:52:6:updateColorBuff	16	static
+neoPixel.c:59:10:getNDTR	0	static
+neoPixel.c:63:6:setMode	0	static
+neoPixel.c:75:6:setModeClear	0	static
+neoPixel.c:78:6:freeNeoPixel	0	static

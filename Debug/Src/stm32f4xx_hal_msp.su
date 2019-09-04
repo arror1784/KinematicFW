@@ -1,0 +1,2 @@
+stm32f4xx_hal_msp.c:85:6:HAL_MspInit	16	static
+stm32f4xx_hal_msp.c:104:6:HAL_TIM_PWM_PulseFinishedCallback	0	static
