@@ -1,0 +1,9 @@
+StepMotorDriver.c:57:6:FinishCallBack	64	static
+StepMotorDriver.c:27:6:SetDirectionGPIO	0	static
+StepMotorDriver.c:35:6:SetEnableGPIO	0	static
+StepMotorDriver.c:42:6:SetSleepGPIO	0	static
+StepMotorDriver.c:45:6:SetResetGPIO	0	static
+StepMotorDriver.c:49:6:SetMicroStep	0	static
+StepMotorDriver.c:53:6:SetEnableIRQ	0	static
+StepMotorDriver.c:84:6:PWMPulseInterruptHandle	0	static
+StepMotorDriver.c:90:6:EXTInterruptHandle	8	static
