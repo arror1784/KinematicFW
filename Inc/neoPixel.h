@@ -32,8 +32,10 @@ void setNeoPixel(WS2812BControl_t *WS2812BControl,TIM_HandleTypeDef* timerContro
 uint32_t converColorTo32(uint8_t green,uint8_t red,uint8_t blue);
 void setColor(WS2812BControl_t *WS2812BControl,uint32_t color, uint16_t ledNo);
 void setColorArr(uint32_t* buf, uint32_t color,uint16_t ledNo);
-void setColorBlack(WS2812BControl_t *WS2812BControl);
-void updateColor(WS2812BControl_t *WS2812BControl);
+
+void updateColorBlack(WS2812BControl_t *WS2812BControl);
+
+void updateColor(WS2812BControl_t *WS2812BControl,int8_t mode);
 void updateColorBuff(WS2812BControl_t *WS2812BControl,uint32_t *buff,uint32_t length);
 void neoPixelPWMPulseInterruptHandler(WS2812BControl_t *WS2812BControl,TIM_HandleTypeDef *htim);
 void freeNeoPixel(WS2812BControl_t *WS2812BControl);

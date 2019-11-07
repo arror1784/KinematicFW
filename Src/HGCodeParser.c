@@ -82,7 +82,6 @@ void HGCodeDecodeCommand(void){
 				}
 				if(checksum != HGCodeBuffer[(index + 23) % MAX_HGCODE_BUFFER]){
 					HAL_UART_Transmit_IT(&huart3,"transmit error\r\n",16);
-//					HAL_UART_Transmit_IT(&huart2,response,8);
 					sendResponse(0,100,0);
 					break;
 				}else{
@@ -93,54 +92,26 @@ void HGCodeDecodeCommand(void){
 					temp.A.ch[1] = HGCodeBuffer[(index + 4) % MAX_HGCODE_BUFFER];
 					temp.A.ch[2] = HGCodeBuffer[(index + 5) % MAX_HGCODE_BUFFER];
 					temp.A.ch[3] = HGCodeBuffer[(index + 6) % MAX_HGCODE_BUFFER];
-	//				temp.A.ch[4] = HGCodeBuffer[(index + 7) % MAX_HGCODE_BUFFER];
-	//				temp.A.ch[5] = HGCodeBuffer[(index + 8) % MAX_HGCODE_BUFFER];
-	//				temp.A.ch[6] = HGCodeBuffer[(index + 9) % MAX_HGCODE_BUFFER];
-	//				temp.A.ch[7] = HGCodeBuffer[(index + 10) % MAX_HGCODE_BUFFER];
 
 					temp.B.ch[0] = HGCodeBuffer[(index + 7) % MAX_HGCODE_BUFFER];
 					temp.B.ch[1] = HGCodeBuffer[(index + 8) % MAX_HGCODE_BUFFER];
 					temp.B.ch[2] = HGCodeBuffer[(index + 9) % MAX_HGCODE_BUFFER];
 					temp.B.ch[3] = HGCodeBuffer[(index + 10) % MAX_HGCODE_BUFFER];
-	//				temp.B.ch[4] = HGCodeBuffer[(index + 15) % MAX_HGCODE_BUFFER];
-	//				temp.B.ch[5] = HGCodeBuffer[(index + 16) % MAX_HGCODE_BUFFER];
-	//				temp.B.ch[6] = HGCodeBuffer[(index + 17) % MAX_HGCODE_BUFFER];
-	//				temp.B.ch[7] = HGCodeBuffer[(index + 18) % MAX_HGCODE_BUFFER];
 
 					temp.C.ch[0] = HGCodeBuffer[(index + 11) % MAX_HGCODE_BUFFER];
 					temp.C.ch[1] = HGCodeBuffer[(index + 12) % MAX_HGCODE_BUFFER];
 					temp.C.ch[2] = HGCodeBuffer[(index + 13) % MAX_HGCODE_BUFFER];
 					temp.C.ch[3] = HGCodeBuffer[(index + 14) % MAX_HGCODE_BUFFER];
-	//				temp.C.ch[4] = HGCodeBuffer[(index + 23) % MAX_HGCODE_BUFFER];
-	//				temp.C.ch[5] = HGCodeBuffer[(index + 24) % MAX_HGCODE_BUFFER];
-	//				temp.C.ch[6] = HGCodeBuffer[(index + 25) % MAX_HGCODE_BUFFER];
-	//				temp.C.ch[7] = HGCodeBuffer[(index + 26) % MAX_HGCODE_BUFFER];
 
 					temp.M.ch[0] = HGCodeBuffer[(index + 15) % MAX_HGCODE_BUFFER];
 					temp.M.ch[1] = HGCodeBuffer[(index + 16) % MAX_HGCODE_BUFFER];
 					temp.M.ch[2] = HGCodeBuffer[(index + 17) % MAX_HGCODE_BUFFER];
 					temp.M.ch[3] = HGCodeBuffer[(index + 18) % MAX_HGCODE_BUFFER];
-	//				temp.M.ch[4] = HGCodeBuffer[(index + 31) % MAX_HGCODE_BUFFER];
-	//				temp.M.ch[5] = HGCodeBuffer[(index + 32) % MAX_HGCODE_BUFFER];
-	//				temp.M.ch[6] = HGCodeBuffer[(index + 33) % MAX_HGCODE_BUFFER];
-	//				temp.M.ch[7] = HGCodeBuffer[(index + 34) % MAX_HGCODE_BUFFER];
 
 					temp.P.ch[0] = HGCodeBuffer[(index + 19) % MAX_HGCODE_BUFFER];
 					temp.P.ch[1] = HGCodeBuffer[(index + 20) % MAX_HGCODE_BUFFER];
 					temp.P.ch[2] = HGCodeBuffer[(index + 21) % MAX_HGCODE_BUFFER];
 					temp.P.ch[3] = HGCodeBuffer[(index + 22) % MAX_HGCODE_BUFFER];
-	//				temp.P.ch[4] = HGCodeBuffer[(index + 39) % MAX_HGCODE_BUFFER];
-	//				temp.P.ch[5] = HGCodeBuffer[(index + 40) % MAX_HGCODE_BUFFER];
-	//				temp.P.ch[6] = HGCodeBuffer[(index + 41) % MAX_HGCODE_BUFFER];
-	//				temp.P.ch[7] = HGCodeBuffer[(index + 42) % MAX_HGCODE_BUFFER];
-
-	//				HGCodePutMainCommand(temp.G,HGCODE_G);
-	//				HGCodePutMainCommand(temp.H,HGCODE_H);
-	//				HGCodePutSubCommand(temp.A.db / 1000.0f,HGCODE_A);
-	//				HGCodePutSubCommand(temp.B.db / 1000.0f,HGCODE_B);
-	//				HGCodePutSubCommand(temp.C.db / 1000.0f,HGCODE_C);
-	//				HGCodePutSubCommand(temp.M.db / 1000.0f,HGCODE_M);
-	//				HGCodePutSubCommand(temp.P.db / 1000.0f,HGCODE_P);
 
 					HGCodePutMainCommand(temp.G,HGCODE_G);
 					HGCodePutMainCommand(temp.H,HGCODE_H);

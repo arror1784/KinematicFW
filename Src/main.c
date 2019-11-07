@@ -131,20 +131,22 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit_IT(&huart3,"boot board\r\n",12);
 
-  HAL_TIM_Base_Start_IT(&htim11);
-  startHGCode(&htim6,&huart2,&hdma_usart2_rx);
+  HAL_TIM_Base_Start_IT(&htim11); //touch timer
 
   STMotorInitHandler(&STMotorDevices[0],&htim1,TIM_CHANNEL_1,EXTI9_5_IRQn);
-  STMotorInitParam(&STMotorDevices[0],400,400,MOTOR_MAX_SPEED,MOTOR_MIN_SPEED);
+  STMotorInitParam(&STMotorDevices[0],STMotorCalcMicroToStep(60000 / 60),STMotorCalcMicroToStep(45000 / 60),STMotorCalcMicroToStep(500000 / 60),1);
 
-  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10);\
+  startHGCode(&htim6,&huart2,&hdma_usart2_rx);
 
-  HAL_TIM_Base_Start_IT(&htim7);
+  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10);
+
+  HAL_TIM_Base_Start_IT(&htim7); //blank timer
+
 
   for(int i = 0 ; i < neoPixel_P->ledCount; i++){
 	  setColor(neoPixel_P,converColorTo32((uint8_t)0,(uint8_t)0,(uint8_t)0),i);
   }
-  updateColor(neoPixel_P);
+  updateColor(neoPixel_P,0);
 
 //  HAL_TIM_PWM_Start_IT(&htim3,TIM_CHANNEL_1);
 
@@ -154,10 +156,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  STMotorWaitingActivate(&STMotorDevices[0],0);
+//	  STMotorGoMicro(&STMotorDevices[0],10000,0);
+//	  STMotorWaitingActivate(&STMotorDevices[0],0);
+//	  STMotorGoMicro(&STMotorDevices[0],-10000,0);
+
 	  if(HGCodeCheckDataBuffer() == 1){
 			temp = HGCodeGetCommandData();
 
-			sprintf(buff,(char*)"Ccout: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d\r\n",
+			sprintf(buff,(char*)"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d\r\n",
 								commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,temp->HGCodeParameter.A,temp->HGCodeParameter.B,temp->HGCodeParameter.C);
 			HAL_UART_Transmit_IT(&huart3,(char*)buff,strlen(buff));
 
@@ -168,6 +175,9 @@ int main(void)
 					break;
 				case 02:
 					G02(temp);
+					break;
+				case 03:
+					G03(temp);
 					break;
 				case 28:
 					G28(temp);

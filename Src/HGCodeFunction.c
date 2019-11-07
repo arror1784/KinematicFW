@@ -24,7 +24,7 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 void G01(HGCodeDataControl_t* temp){
 	if(temp->HGCodeParameter.A){
 		if(!STMotorIsActivate(&STMotorDevices[0])){
-			STMotorGoMicro(&STMotorDevices[0],temp->HGCodeParameter.A);
+			STMotorGoMicro(&STMotorDevices[0],temp->HGCodeParameter.A,temp->HGCodeParameter.M);
 		}else{
 //			HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 A 1 FAIL",12);
 		}
@@ -35,8 +35,19 @@ void G01(HGCodeDataControl_t* temp){
 void G02(HGCodeDataControl_t* temp){
 	if(temp->HGCodeParameter.A){
 			if(!STMotorIsActivate(&STMotorDevices[0])){
-				STMotorGoStep(&STMotorDevices[0],STMotorCalcMicroToStep(temp->HGCodeParameter.A) - STMotorDevices[0].motorParam.curPosition);
+				STMotorGoStep(&STMotorDevices[0],STMotorCalcMicroToStep(temp->HGCodeParameter.A) - STMotorDevices[0].motorParam.curPosition,temp->HGCodeParameter.M);
 //				STMotorGoMilli(&STMotorDevices[0],temp->HGCodeParameter.A);
+			}else{
+//				HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 A 1 FAIL",12);
+		}
+		temp->HGCodeParameter.A = 0;
+	}
+	return;
+}
+void G03(HGCodeDataControl_t* temp){
+	if(temp->HGCodeParameter.A){
+			if(!STMotorIsActivate(&STMotorDevices[0])){
+				STMotorGoStep(&STMotorDevices[0],temp->HGCodeParameter.A,temp->HGCodeParameter.M);
 			}else{
 //				HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"G01 A 1 FAIL",12);
 		}
@@ -79,6 +90,7 @@ void H01(HGCodeDataControl_t* temp){
 void H05(HGCodeDataControl_t* temp){
 	return;
 }
+
 void H10(HGCodeDataControl_t* temp){ //UV LED OFF
 	HAL_GPIO_WritePin(UV_LED_MIDDLE_GPIO_Port,UV_LED_MIDDLE_Pin,GPIO_PIN_RESET);
 //	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H10 OK",6);
@@ -95,10 +107,13 @@ void H21(HGCodeDataControl_t* temp){ //UV COOLER ON
 //	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_SET);
 //	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H21 OK",6);
 }
+
+//H3x : 분당 밀리미터 단위
+
 void H30(HGCodeDataControl_t* temp){ //SET MAX SPEED
 	if(temp->HGCodeParameter.A){
 //		STMotorSetMaxSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
-		STMotorSetMaxSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))));
+		STMotorSetMaxSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))),temp->HGCodeParameter.M);
 		temp->HGCodeParameter.A = 0;
 	}
 	HAL_Delay(5);
@@ -107,7 +122,7 @@ void H30(HGCodeDataControl_t* temp){ //SET MAX SPEED
 void H31(HGCodeDataControl_t* temp){ //SET MIN SPEED
 	if(temp->HGCodeParameter.A){
 //		STMotorSetMinSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
-		STMotorSetMinSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))));
+		STMotorSetMinSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))),temp->HGCodeParameter.M);
 
 		temp->HGCodeParameter.A = 0;
 	}
@@ -117,7 +132,7 @@ void H31(HGCodeDataControl_t* temp){ //SET MIN SPEED
 void H32(HGCodeDataControl_t* temp){ //SET ACCEL SPEED
 	if(temp->HGCodeParameter.A){
 //		STMotorSetAccelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
-		STMotorSetAccelSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))));
+		STMotorSetAccelSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))),temp->HGCodeParameter.M);
 
 		temp->HGCodeParameter.A = 0;
 	}
@@ -127,8 +142,7 @@ void H32(HGCodeDataControl_t* temp){ //SET ACCEL SPEED
 void H33(HGCodeDataControl_t* temp){ //SET DECEL SPEED
 	if(temp->HGCodeParameter.A){
 //		STMotorSetDecelSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
-		STMotorSetDecelSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))));
-
+		STMotorSetDecelSpeed(&STMotorDevices[0],(uint32_t)(((double)temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))),temp->HGCodeParameter.M);
 		temp->HGCodeParameter.A = 0;
 	}
 	HAL_Delay(5);
@@ -173,12 +187,10 @@ void H44(){
 
 void H50(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P){
 
-	setMode(neoPixel_P,0);
 	for(int i = 0 ; i < neoPixel_P->ledCount; i++){
 		setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
 	}
-	updateColor(neoPixel_P);
-
+	updateColor(neoPixel_P,0);
 }
 void H51(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P){
 //	uint32_t buff[10 + 2 * 24] = { 0 };
@@ -186,7 +198,7 @@ void H51(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P){
 //		setColorArr(&buff[24],converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
 		setColor(neoPixel_P,converColorTo32((uint8_t)temp->HGCodeParameter.B,(uint8_t)temp->HGCodeParameter.A,(uint8_t)temp->HGCodeParameter.C),i);
 	}
-	setMode(neoPixel_P,1);
+	updateColor(neoPixel_P,1);
 }
 void H60(HGCodeDataControl_t* temp){
 //	uint8_t buff[50] = {0};

@@ -39,6 +39,7 @@ void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHa
 
 void G01(HGCodeDataControl_t* temp);
 void G02(HGCodeDataControl_t* temp);
+void G03(HGCodeDataControl_t* temp);
 void G04(HGCodeDataControl_t* temp);
 void G05(HGCodeDataControl_t* temp);
 void G27(HGCodeDataControl_t* temp);

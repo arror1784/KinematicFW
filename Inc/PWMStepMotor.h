@@ -35,23 +35,22 @@ uint16_t STMotorSetDeviceNum(STMotorHandle_t* STMotorHandle,uint16_t deviceNum);
 
 uint32_t STMotorSetMicroStep(STMotorHandle_t* STMotorHandle, uint32_t microStep);
 uint32_t STMotorSetMotorStep(STMotorHandle_t* STMotorHandle, uint32_t motorStep);
-uint32_t STMotorSetMaxSpeed(STMotorHandle_t* STMotorHandle, uint32_t maxSpeed);
-uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed);
-uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed);
-uint32_t STMotorSetAccelSpeed(STMotorHandle_t* STMotorHandle, uint32_t accel);
-uint32_t STMotorSetDecelSpeed(STMotorHandle_t* STMotorHandle, uint32_t decel);
+uint32_t STMotorSetMaxSpeed(STMotorHandle_t* STMotorHandle, uint32_t maxSpeed,uint8_t mode);
+uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed,uint8_t mode);
+uint32_t STMotorSetAccelSpeed(STMotorHandle_t* STMotorHandle, uint32_t accel,uint8_t mode);
+uint32_t STMotorSetDecelSpeed(STMotorHandle_t* STMotorHandle, uint32_t decel,uint8_t mode);
 
 
 uint32_t STMotorClearCurPosition(STMotorHandle_t* STMotorHandle);
 
-uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep);
+uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uint8_t mode);
 
 uint32_t STMotorMoveStart(STMotorHandle_t* STMotorHandle);
 
-uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step);
+uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step,uint8_t mode);
 //uint32_t STMotorGoMilli(STMotorHandle_t* STMotorHandle,double milli);
-uint32_t STMotorGoMicro(STMotorHandle_t* STMotorHandle,int32_t micro);
-uint32_t STMotorGoRotation(STMotorHandle_t* STMotorHandle,double rotation);
+uint32_t STMotorGoMicro(STMotorHandle_t* STMotorHandle,int32_t micro,uint8_t mode);
+uint32_t STMotorGoRotation(STMotorHandle_t* STMotorHandle,double rotation,uint8_t mode);
 uint32_t STMotorHardStop(STMotorHandle_t* STMotorHandle);
 uint32_t STMotorSoftStop(STMotorHandle_t* STMotorHandle);
 

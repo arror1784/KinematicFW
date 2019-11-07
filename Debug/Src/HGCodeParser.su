@@ -3,8 +3,8 @@ HGCodeParser.c:34:6:HGCodeDMAStart	0	static
 HGCodeParser.c:38:8:HGCodeCheckCommandBuffer	0	static
 HGCodeParser.c:46:8:HGCodeCheckDataBuffer	0	static
 HGCodeParser.c:54:6:HGCodeDecodeCommand	48	static
-HGCodeParser.c:163:10:HGCodeGetCommandCount	0	static
-HGCodeParser.c:167:22:HGCodeGetCommandData	12	static
-HGCodeParser.c:182:6:HGCodePutMainCommand	0	static
-HGCodeParser.c:193:6:HGCodePutSubCommand	0	static
-HGCodeParser.c:216:6:DecodeTimerInterruptHandler	8	static
+HGCodeParser.c:134:10:HGCodeGetCommandCount	0	static
+HGCodeParser.c:138:22:HGCodeGetCommandData	12	static
+HGCodeParser.c:153:6:HGCodePutMainCommand	0	static
+HGCodeParser.c:164:6:HGCodePutSubCommand	0	static
+HGCodeParser.c:187:6:DecodeTimerInterruptHandler	8	static

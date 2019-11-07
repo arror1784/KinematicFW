@@ -54,8 +54,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
- #define DEBOUNCING_TIME 10
-
+#define DEBOUNCING_SHORT_TIME 10
+#define DEBOUNCING_LONG_TIME 150
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -68,11 +68,11 @@
 extern uint8_t blankMode;
 
 
-uint32_t frt_before_time = 0;
-uint32_t end_before_time = 0;
-uint32_t count = 0;
-uint32_t TIM7count = 0;
-uint8_t blankFlag = 0;
+volatile uint32_t frt_before_time = 0;
+volatile uint32_t end_before_time = 0;
+volatile uint32_t count = 0;
+volatile uint32_t TIM7count = 0;
+volatile uint8_t blankFlag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -314,21 +314,35 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_TRG_COM_TIM11_IRQn 0 */
-	if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_SET){
-		if(HAL_GetTick() - end_before_time >= DEBOUNCING_TIME ){
-			end_before_time  = HAL_GetTick();
-			count += 1;
+	if(count == 0){
+		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_SET){
+			count = 1;
 		}
-	}else{
-		if(count != 0){
-			if(count > 3 && count < 150){
-				EXTInterruptHandle(BTN_FRT_SHORT);
-			}else if(count >= 150){
-				EXTInterruptHandle(BTN_FRT_LONG);
-			}
+	}else if(count == DEBOUNCING_SHORT_TIME){
+		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_SET){
+			count += 1;
+		}else{
 			count = 0;
 		}
+	}else{
+		count += 1;
+		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) != GPIO_PIN_SET){
+			if(count > DEBOUNCING_SHORT_TIME && count < DEBOUNCING_LONG_TIME){
+				EXTInterruptHandle(BTN_FRT_SHORT);
+				count = 0;
+			}else if(count > DEBOUNCING_LONG_TIME){
+				EXTInterruptHandle(BTN_FRT_LONG);
+				count = 0;
+			}
+		}
 	}
+//		if(count > 10 && count < 150){
+//			EXTInterruptHandle(BTN_FRT_SHORT);
+//		}else if(count >= 150){
+//			EXTInterruptHandle(BTN_FRT_LONG);
+//		}
+//		count = 0;
+
   /* USER CODE END TIM1_TRG_COM_TIM11_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   HAL_TIM_IRQHandler(&htim11);
@@ -431,11 +445,8 @@ void TIM7_IRQHandler(void)
 	uint32_t buff[10*24+48] = {0};
 	if(blankMode == 1){
 		if(TIM7count == 4){
-//			for(int i = 0 ; i < neoPixel_P->ledCount; i++){
-//				setColorArr(&buff[24],blankFlag ? converColorTo32(0xff,0xff,0xff) : converColorTo32(0,0,0),i);
-//			}
 			if(blankFlag)
-				updateColor(neoPixel_P);
+				updateColor(neoPixel_P,-1);
 			else{
 				for(int i = 0 ; i < neoPixel_P->ledCount; i++){
 					setColorArr(&buff[24],converColorTo32(0,0,0),i);

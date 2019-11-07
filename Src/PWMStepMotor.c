@@ -38,14 +38,16 @@ bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handl
 //	HAL_NVIC_DisableIRQ(STMotorHandle->motorHandler.IRQn);
 //	HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
 
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 	return TRUE;
 }
 
 bool STMotorInitParam(STMotorHandle_t* STMotorHandle, uint32_t accel,uint32_t decel,uint32_t maxSpeed,uint32_t minSpeed){
 
 	STMotorHandle->motorParam.accel = (accel) ? accel : MOTOR_ACCEL;
+	STMotorHandle->motorParam.accel_2 = (accel) ? accel : MOTOR_ACCEL;
 	STMotorHandle->motorParam.decel = (decel) ? decel : MOTOR_DECEL;
+	STMotorHandle->motorParam.decel_2 = (decel) ? decel : MOTOR_DECEL;
 	STMotorHandle->motorParam.maxSpeed = (maxSpeed) ? maxSpeed : MOTOR_MAX_SPEED;
 	STMotorHandle->motorParam.minSpeed = (minSpeed) ? minSpeed : MOTOR_MIN_SPEED;
 	//STMotorHandle->motorParam.microStep = (microStep) ? microStep : MOTOR_MICRO_STEP;
@@ -85,36 +87,56 @@ uint8_t STMotorGetScrewPitch(STMotorDeviceControl_t* STMotorHandle){
 uint16_t STMotorGetDeviceNum(STMotorHandle_t* STMotorHandle){
 	return STMotorHandle->motorHandler.deviceNumber;
 }
-uint32_t STMotorSetMaxSpeed(STMotorHandle_t* STMotorHandle, uint32_t maxSpeed){
-	return STMotorHandle->motorParam.maxSpeed = maxSpeed;
-}
-uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed){
-	return STMotorHandle->motorParam.minSpeed = minSpeed;
-}
-uint32_t STMotorSetcurSpeed(STMotorHandle_t* STMotorHandle, uint32_t curSpeed){
-	return STMotorHandle->motorParam.curSpeed = curSpeed;
-}
+
 uint16_t STMotorSetDeviceNum(STMotorHandle_t* STMotorHandle,uint16_t deviceNum){
 	return STMotorHandle->motorHandler.deviceNumber = deviceNum;
 }
-uint32_t STMotorSetAccelSpeed(STMotorHandle_t* STMotorHandle, uint32_t accel){
-	return STMotorHandle->motorParam.accel = accel;
+uint32_t STMotorSetMaxSpeed(STMotorHandle_t* STMotorHandle, uint32_t maxSpeed,uint8_t mode){
+	if(mode)
+		STMotorHandle->motorParam.maxSpeed = maxSpeed;
+	else
+		STMotorHandle->motorParam.maxSpeed = maxSpeed;
+	return maxSpeed;
+//	return STMotorHandle->motorParam.maxSpeed = maxSpeed;
 }
-uint32_t STMotorSetDecelSpeed(STMotorHandle_t* STMotorHandle, uint32_t decel){
-	return STMotorHandle->motorParam.decel = decel;
+uint32_t STMotorSetMinSpeed(STMotorHandle_t* STMotorHandle, uint32_t minSpeed,uint8_t mode){
+	if(mode)
+		STMotorHandle->motorParam.minSpeed = minSpeed;
+	else
+		STMotorHandle->motorParam.minSpeed = minSpeed;
+	return minSpeed;//	return STMotorHandle->motorParam.minSpeed = minSpeed;
+}
+uint32_t STMotorSetAccelSpeed(STMotorHandle_t* STMotorHandle, uint32_t accel,uint8_t mode){
+	if(mode)
+		STMotorHandle->motorParam.accel_2 = accel;
+	else
+		STMotorHandle->motorParam.accel = accel;
+	return accel;//	return STMotorHandle->motorParam.accel = accel;
+}
+uint32_t STMotorSetDecelSpeed(STMotorHandle_t* STMotorHandle, uint32_t decel,uint8_t mode){
+	if(mode)
+		STMotorHandle->motorParam.decel_2 = decel;
+	else
+		STMotorHandle->motorParam.decel = decel;
+	return decel;//	return STMotorHandle->motorParam.decel = decel;
 }
 
-uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep){
+uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uint8_t mode){
 
 	uint32_t accSteps;
 	uint32_t decSteps;
 
 	uint32_t minSpeed = STMotorHandle->motorParam.minSpeed;
 	uint32_t maxSpeed = STMotorHandle->motorParam.maxSpeed;
-
-	uint32_t acc = STMotorHandle->motorParam.accel;
-	uint32_t dec = STMotorHandle->motorParam.decel;
-
+	uint32_t acc = 0;
+	uint32_t dec = 0;
+	if(mode == 1){
+		acc = STMotorHandle->motorParam.accel_2;
+		dec = STMotorHandle->motorParam.decel_2;
+	}else if(mode == 0){
+		acc = STMotorHandle->motorParam.accel;
+		dec = STMotorHandle->motorParam.decel;
+	}
 	accSteps = (maxSpeed - minSpeed) * (maxSpeed + minSpeed);
 	decSteps = accSteps;
 	accSteps /= acc;
@@ -166,7 +188,7 @@ uint32_t STMotorStopFreq(STMotorHandle_t* STMotorHandle){
 	return 0;
 }
 
-uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
+uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step,uint8_t mode){
 
 	if(STMotorHandle->motorHandler.isActivate == FALSE){
 		STMotorHandle->motorHandler.isActivate = TRUE;
@@ -183,7 +205,7 @@ uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step){
 			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_FORWORD);
 		}
 
-		STMotorCalcAccelSpeed(STMotorHandle,STMotorHandle->motorParam.targetStep);
+		STMotorCalcAccelSpeed(STMotorHandle,STMotorHandle->motorParam.targetStep,mode);
 
 		STMotorMoveStart(STMotorHandle);
 
@@ -274,11 +296,11 @@ uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,int32_t speed){
 //uint32_t STMotorGoMilli(STMotorHandle_t* STMotorHandle,double milli){
 //	return STMotorGoStep(STMotorHandle, STMotorCalcMilliToStep(milli));
 //}
-uint32_t STMotorGoMicro(STMotorHandle_t* STMotorHandle,int32_t micro){
-	return STMotorGoStep(STMotorHandle, STMotorCalcMicroToStep(micro));
+uint32_t STMotorGoMicro(STMotorHandle_t* STMotorHandle,int32_t micro,uint8_t mode){
+	return STMotorGoStep(STMotorHandle, STMotorCalcMicroToStep(micro),mode);
 }
-uint32_t STMotorGoRotation(STMotorHandle_t* STMotorHandle,double rotation){
-	return STMotorGoStep(STMotorHandle, STMotorCalcRotationToStep(rotation));
+uint32_t STMotorGoRotation(STMotorHandle_t* STMotorHandle,double rotation,uint8_t mode){
+	return STMotorGoStep(STMotorHandle, STMotorCalcRotationToStep(rotation),mode);
 }
 
 uint32_t STMotorHardStop(STMotorHandle_t* STMotorHandle){
@@ -308,7 +330,7 @@ uint8_t STMotorIsActivate(STMotorHandle_t* STMotorHandle){
 uint32_t STMotorGoHome(STMotorHandle_t* STMotorHandle){
 
 	int32_t step = -STMotorHandle->motorParam.curPosition;
-	if(STMotorGoStep(STMotorHandle,step) == 1){
+	if(STMotorGoStep(STMotorHandle,step,0) == 1){
 		STMotorDeviceControl.FinishCallBack(STMotorHandle);
 	}
 	return 0;
@@ -347,8 +369,6 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 	uint32_t speed = STMotorHandle->motorParam.curSpeed;
 	uint32_t accel = STMotorHandle->motorParam.accel << 16;
 	uint32_t decel = STMotorHandle->motorParam.decel << 16;
-
-//	STMotorHandle->motorParam.curPosition += STMotorHandle->motorParam.direction ? 1 : -1;
 
 	bool speedUpdated = FALSE;
 
@@ -430,7 +450,7 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			STMotorHandle->motorParam.targetStep = 0;
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			STMotorHandle->motorParam.state = STATE_STOP;
-			STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+			STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 			STMotorStopFreq(STMotorHandle);
 			break;
 		case STATE_FINISH_AUTO_HOME:
@@ -439,7 +459,7 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 				STMotorHandle->motorParam.nStep = 0;
 				STMotorHandle->motorParam.targetStep = 0;
 				STMotorHandle->motorHandler.isActivate = FALSE;
-				STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+				STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 				STMotorStopFreq(STMotorHandle);
 				STMotorSetHome(STMotorHandle);
 			}

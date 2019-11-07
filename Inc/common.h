@@ -19,18 +19,9 @@
 
 #define MOTER_DRIVER 				A4988
 
-//#define MAX_SPEED 5000
-//#define MIN_SPEED 800
-
-//#define MOTOR_DRIVER_MIN_STEP_DELAY		1
-//#define MOTOR_DRIVER_MiCRO_STEP			(uint32_t)16
-//#define MOTOR_STEP						(uint32_t)200
-//#define MOTOR_SCREW_PITCH					2
-//#define MOTOR_SCREW_LENGHT				500 // unit : mm
-//
 #define MOTOR_PRESCALER					1024-1
-#define MOTOR_MAX_SPEED					5000
-#define MOTOR_MIN_SPEED					3200
+#define MOTOR_MAX_SPEED					150
+#define MOTOR_MIN_SPEED					20
 #define MOTOR_ACCEL 					0
 #define MOTOR_DECEL						0
 #define MOTOR_MOTOR_STEP				200
@@ -87,16 +78,20 @@ typedef struct{
 	volatile MotorDirection_t direction;
 	volatile MotorState_t state;
 
-	volatile int32_t curPosition; //unit : milli.....step.....??..rotation??
+	volatile int32_t curPosition; //unit : step
 	volatile uint32_t nStep;
 	volatile uint32_t targetStep;
 
 	volatile uint32_t accel;
 	volatile uint32_t decel;
 
-	volatile uint32_t curSpeed;
+	volatile uint32_t accel_2;
+	volatile uint32_t decel_2;
+
 	volatile uint32_t maxSpeed;
 	volatile uint32_t minSpeed;
+
+	volatile uint32_t curSpeed;
 
 	volatile uint32_t endAccel;
 	volatile uint32_t startDecel;
@@ -105,7 +100,6 @@ typedef struct{
 	//volatile uint8_t microStep;
 	//volatile uint8_t motorStep;
 	//volatile uint8_t screwPitch
-
 }STMotorParam;
 
 typedef struct{
