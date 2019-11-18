@@ -88,6 +88,8 @@ typedef struct{
 	volatile uint32_t accel_2;
 	volatile uint32_t decel_2;
 
+	volatile uint32_t mode;
+
 	volatile uint32_t maxSpeed;
 	volatile uint32_t minSpeed;
 
