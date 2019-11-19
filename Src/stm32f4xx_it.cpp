@@ -315,18 +315,18 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_TRG_COM_TIM11_IRQn 0 */
 	if(count == 0){
-		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_SET){
+		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_RESET){
 			count = 1;
 		}
 	}else if(count == DEBOUNCING_SHORT_TIME){
-		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_SET){
+		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_RESET){
 			count += 1;
 		}else{
 			count = 0;
 		}
 	}else{
 		count += 1;
-		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) != GPIO_PIN_SET){
+		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) != GPIO_PIN_RESET){
 			if(count > DEBOUNCING_SHORT_TIME && count < DEBOUNCING_LONG_TIME){
 				EXTInterruptHandle(BTN_FRT_SHORT);
 				count = 0;
@@ -442,24 +442,7 @@ void TIM6_DAC_IRQHandler(void)
 void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
-	uint32_t buff[10*24+48] = {0};
-	if(blankMode == 1){
-		if(TIM7count == 4){
-			if(blankFlag)
-				updateColor(neoPixel_P,-1);
-			else{
-				for(int i = 0 ; i < neoPixel_P->ledCount; i++){
-					setColorArr(&buff[24],converColorTo32(0,0,0),i);
-				}
-				updateColorBuff(neoPixel_P,buff,10*24+48);
-			}
-			blankFlag = ~blankFlag;
-
-			TIM7count = 0;
-		}else{
-			TIM7count++;
-		}
-	}
+	NPEXITHandle(&neoPixel);
   /* USER CODE END TIM7_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */

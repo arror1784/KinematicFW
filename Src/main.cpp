@@ -137,20 +137,19 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim11); //touch timer
 
   STMotorInitHandler(&STMotorDevices[0],&htim1,(HAL_TIM_ActiveChannel)TIM_CHANNEL_1,EXTI9_5_IRQn);
-  STMotorInitParam(&STMotorDevices[0],STMotorCalcMicroToStep(60000 / 60),STMotorCalcMicroToStep(45000 / 60),STMotorCalcMicroToStep(500000 / 60),1);
+  STMotorInitParam(&STMotorDevices[0],STMotorCalcMicroToStep(60000 / 60),STMotorCalcMicroToStep(45000 / 60),STMotorCalcMicroToStep(600000 / 60),1);
 
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
 
-  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10);
+  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10,&htim7);
 
-  HAL_TIM_Base_Start_IT(&htim7); //blank timer
+//  HAL_TIM_Base_Start_IT(&htim7); //blank timer
 
 
   for(int i = 0 ; i < neoPixel_P->ledCount; i++){
 	  setColor(neoPixel_P,converColorTo32((uint8_t)0,(uint8_t)0,(uint8_t)0),i);
   }
   updateColor(neoPixel_P,0);
-
 //  HAL_TIM_PWM_Start_IT(&htim3,TIM_CHANNEL_1);
 
   /* USER CODE END 2 */
@@ -160,16 +159,17 @@ int main(void)
   while (1)
   {
 //	  STMotorWaitingActivate(&STMotorDevices[0],0);
-//	  STMotorGoMicro(&STMotorDevices[0],10000,0);
+//	  STMotorSetAccelSpeed(&STMotorDevices[0],5244,1);
+//	  STMotorGoMicro(&STMotorDevices[0],100000,1);
 //	  STMotorWaitingActivate(&STMotorDevices[0],0);
 //	  STMotorGoMicro(&STMotorDevices[0],-10000,0);
 
 	  if(HGCodeCheckDataBuffer() == 1){
 			temp = HGCodeGetCommandData();
 
-			sprintf((char*)buff,"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d\r\n",
-			commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,temp->HGCodeParameter.A,
-			temp->HGCodeParameter.B,temp->HGCodeParameter.C);
+			sprintf((char*)buff,"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d M: %d\r\n",
+								commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,
+								temp->HGCodeParameter.A,temp->HGCodeParameter.B,temp->HGCodeParameter.C,temp->HGCodeParameter.M);
 			HAL_UART_Transmit_IT(&huart3,buff,strlen((char*)buff));
 
 			if(temp->HGCodeCommand.G != 0){
@@ -234,6 +234,7 @@ int main(void)
 					break;
 				case 51:
 					H51(temp,neoPixel_P);
+					break;
 				case 100:
 					H100(temp);
 					break;

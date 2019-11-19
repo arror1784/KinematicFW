@@ -137,6 +137,9 @@ uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uin
 		acc = STMotorHandle->motorParam.accel;
 		dec = STMotorHandle->motorParam.decel;
 	}
+
+	STMotorHandle->motorParam.mode = mode;
+
 	accSteps = (maxSpeed - minSpeed) * (maxSpeed + minSpeed);
 	decSteps = accSteps;
 	accSteps /= acc;
@@ -367,8 +370,19 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 	uint32_t relStep = STMotorHandle->motorParam.nStep++;
 	uint32_t targetStep = STMotorHandle->motorParam.targetStep;
 	uint32_t speed = STMotorHandle->motorParam.curSpeed;
-	uint32_t accel = STMotorHandle->motorParam.accel << 16;
-	uint32_t decel = STMotorHandle->motorParam.decel << 16;
+
+	uint32_t accel;
+	uint32_t decel;
+
+	if(STMotorHandle->motorParam.mode){
+		accel = STMotorHandle->motorParam.accel_2 << 16;
+		decel = STMotorHandle->motorParam.decel_2 << 16;
+	}else{
+		accel = STMotorHandle->motorParam.accel << 16;
+		decel = STMotorHandle->motorParam.decel << 16;
+
+	}
+
 
 	bool speedUpdated = FALSE;
 
