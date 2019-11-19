@@ -73,7 +73,7 @@ void G28(HGCodeDataControl_t* temp){
 		else
 			STMotorAutoHome(&STMotorDevices[0],(int32_t)((temp->HGCodeParameter.A / 60 ) / ((double)MOTOR_SCREW_PITCH_MIL / ((double)MOTOR_MICRO_STEP * (double)MOTOR_MOTOR_STEP))));
 	}else
-		HAL_UART_Transmit(&huart3,"is activate\r\n",14,1000);
+		HAL_UART_Transmit(&huart3,(uint8_t*)"is activate\r\n",14,1000);
 }
 void G30(HGCodeDataControl_t* temp){
 	return;

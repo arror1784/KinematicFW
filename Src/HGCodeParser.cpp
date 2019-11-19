@@ -8,6 +8,7 @@
 #include "HGCodeParser.h"
 #include "usart.h"
 #include "string.h"
+#include "HGCodeFunction.h"
 
 uint8_t HGCodeBuffer[MAX_HGCODE_BUFFER] = {0};
 HGCodeControl_t HGCodeControl = {0};
@@ -81,7 +82,7 @@ void HGCodeDecodeCommand(void){
 					checksum += HGCodeBuffer[(index + j) % MAX_HGCODE_BUFFER];
 				}
 				if(checksum != HGCodeBuffer[(index + 23) % MAX_HGCODE_BUFFER]){
-					HAL_UART_Transmit_IT(&huart3,"transmit error\r\n",16);
+					HAL_UART_Transmit_IT(&huart3,(uint8_t*)"transmit error\r\n",16);
 					sendResponse(0,100,0);
 					break;
 				}else{

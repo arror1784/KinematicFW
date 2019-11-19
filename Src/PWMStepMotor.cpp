@@ -13,7 +13,6 @@
 #include "stdlib.h"
 
 uint8_t deviceCount = 0;
-uint8_t buff[100];
 uint8_t endStopSignal = FALSE;
 //extern HAL_UART_StateTypeDef huart2;
 
@@ -22,7 +21,8 @@ bool STMotorInitControl(void){
 	return TRUE;
 }
 
-bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handle, HAL_TIM_ActiveChannel channel,IRQn_Type IRQn){
+bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handle,
+		HAL_TIM_ActiveChannel channel,IRQn_Type IRQn){
 
 	STMotorHandle->motorHandler.timHandle = Handle;
 	STMotorHandle->motorHandler.instance = Handle->Instance;

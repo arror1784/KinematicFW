@@ -39,6 +39,8 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+
 #include "main.h"
 #include "dma.h"
 #include "tim.h"
@@ -98,6 +100,7 @@ int main(void)
   HGCodeDataControl_t* temp = 0;
   uint32_t commandCount = 0;
 
+
   /* USER CODE END 1 */
   
 
@@ -129,11 +132,11 @@ int main(void)
   MX_TIM11_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Transmit_IT(&huart3,"boot board\r\n",12);
+  HAL_UART_Transmit_IT(&huart3,(uint8_t*)"boot board\r\n",12);
 
   HAL_TIM_Base_Start_IT(&htim11); //touch timer
 
-  STMotorInitHandler(&STMotorDevices[0],&htim1,TIM_CHANNEL_1,EXTI9_5_IRQn);
+  STMotorInitHandler(&STMotorDevices[0],&htim1,(HAL_TIM_ActiveChannel)TIM_CHANNEL_1,EXTI9_5_IRQn);
   STMotorInitParam(&STMotorDevices[0],STMotorCalcMicroToStep(60000 / 60),STMotorCalcMicroToStep(45000 / 60),STMotorCalcMicroToStep(600000 / 60),1);
 
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
@@ -164,10 +167,10 @@ int main(void)
 	  if(HGCodeCheckDataBuffer() == 1){
 			temp = HGCodeGetCommandData();
 
-			sprintf(buff,(char*)"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d M: %d\r\n",
+			sprintf((char*)buff,"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d M: %d\r\n",
 								commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,
 								temp->HGCodeParameter.A,temp->HGCodeParameter.B,temp->HGCodeParameter.C,temp->HGCodeParameter.M);
-			HAL_UART_Transmit_IT(&huart3,(char*)buff,strlen(buff));
+			HAL_UART_Transmit_IT(&huart3,buff,strlen((char*)buff));
 
 			if(temp->HGCodeCommand.G != 0){
 				switch(temp->HGCodeCommand.G){

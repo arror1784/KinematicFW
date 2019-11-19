@@ -29,7 +29,6 @@
 #define MOTOR_SCREW_PITCH				2000 // unit : micro
 #define MOTOR_SCREW_PITCH_MIL			2
 
-typedef uint8_t						bool;
 
 typedef enum{
 
