@@ -470,7 +470,7 @@ void TIM7_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 //	HAL_UART_Transmit_IT(&huart2,"end stop interrupt\r\n",40);
-	EXTInterruptHandle(GPIO_Pin);
+	EXTInterruptHandle((BtnChannel_t)GPIO_Pin);
 }
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

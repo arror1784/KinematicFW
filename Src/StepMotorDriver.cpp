@@ -10,6 +10,7 @@
 #include "PWMStepMotor.h"
 #include "HGCodeFunction.h"
 #include "usart.h"
+#include <stdio.h>
 
 
 STMotorHandle_t STMotorDevices[4];
@@ -61,7 +62,7 @@ void FinishCallBack(STMotorHandle_t *STMotorHandle){
 		case 0x00:
 //			HAL_UART_Transmit_IT(&huart2,response,12);
 			sendResponse(1,101,100);
-			sprintf(buff,(char*)"current position %ld\r\n",STMotorHandle->motorParam.curPosition);
+			sprintf((char*)buff,(char*)"current position %ld\r\n",STMotorHandle->motorParam.curPosition);
 			while(HAL_UART_Transmit(&huart3,(uint8_t*)buff,40,1000) != HAL_OK);
 			break;
 		case 0x01:
