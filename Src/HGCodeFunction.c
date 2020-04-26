@@ -4,15 +4,14 @@
  *  Created on: 2019. 2. 15.
  *      Author: JeonSeungHwan
  */
-#include "../Inc/HGCodeFunction.h"
+#include "HGCodeFunction.h"
+#include "StepMotorDriver.h"
 #include "string.h"
 #include "tim.h"
 #include "neoPixel.h"
 #include "usart.h"
 
-extern STMotorHandle_t STMotorDevices[1];
 extern HGCodeControl_t HGCodeControl;
-extern DMA_HandleTypeDef hdma_tim1_ch4_trig_com;
 
 void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 
@@ -84,32 +83,36 @@ void G31(HGCodeDataControl_t* temp){
 void G99(HGCodeDataControl_t* temp){
 	return;
 }
+
+
 void H01(HGCodeDataControl_t* temp){
 	return;
 }
 void H05(HGCodeDataControl_t* temp){
 	return;
 }
-
 void H10(HGCodeDataControl_t* temp){ //UV LED OFF
-	HAL_GPIO_WritePin(UV_LED_MIDDLE_GPIO_Port,UV_LED_MIDDLE_Pin,GPIO_PIN_RESET);
-//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H10 OK",6);
+//	HAL_GPIO_WritePin(UV_LED_MIDDLE_GPIO_Port,UV_LED_MIDDLE_Pin,GPIO_PIN_RESET);
+	  HAL_TIM_PWM_Stop_IT(&htim12,TIM_CHANNEL_2);
 }
 void H11(HGCodeDataControl_t* temp){ //UV LED ON
-	HAL_GPIO_WritePin(UV_LED_MIDDLE_GPIO_Port,UV_LED_MIDDLE_Pin,GPIO_PIN_SET);
-//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H11 OK",6);
+//	HAL_GPIO_WritePin(UV_LED_MIDDLE_GPIO_Port,UV_LED_MIDDLE_Pin,GPIO_PIN_SET);
+	  HAL_TIM_PWM_Start_IT(&htim12,TIM_CHANNEL_2);
+}
+void H12(HGCodeDataControl_t* temp){ //SET UV LED PWM
+	__HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, temp->HGCodeParameter.A);
 }
 void H20(HGCodeDataControl_t* temp){ //UV COOLER OFF
-//	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_RESET);
-//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H20 OK",6);
+	HAL_TIM_Base_Stop_IT(&htim10);
 }
 void H21(HGCodeDataControl_t* temp){ //UV COOLER ON
-//	HAL_GPIO_WritePin(COOLING_FAN_GPIO_Port,COOLING_FAN_Pin,GPIO_PIN_SET);
-//	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H21 OK",6);
+	HAL_TIM_Base_Start_IT(&htim10);
+}
+void H22(HGCodeDataControl_t* temp){ //SET UV COOLER PWM
+	__HAL_TIM_SET_COMPARE(&htim10, TIM_CHANNEL_1, temp->HGCodeParameter.A);
 }
 
-//H3x : 분당 밀리미터 단위
-
+//H3x : 입력값 : 분당 밀리미터 단위
 void H30(HGCodeDataControl_t* temp){ //SET MAX SPEED
 	if(temp->HGCodeParameter.A){
 //		STMotorSetMaxSpeed(&STMotorDevices[0],temp->HGCodeParameter.A);
@@ -177,7 +180,7 @@ void H43(HGCodeDataControl_t* temp){
 //		HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
 //	}
 }
-void H44(){
+void H44(HGCodeDataControl_t* temp){
 //	uint8_t buff[50] = {0};
 //	if(temp->HGCodeParameter.A){
 //		sprintf(buff,"current position %lu\r\n",	STMotorDevices[0].motorParam.curPosition);
@@ -206,16 +209,7 @@ void H60(HGCodeDataControl_t* temp){
 //	HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
 }
 void H100(HGCodeDataControl_t* temp){
-//	uint8_t buff[6];
-//	buff[0] = 0x02;
-//	buff[1] = 'O';
-//	buff[2] = 'K';
-//	buff[3] = 0x9A;
-//	buff[4] = 0x03;
-//
-//	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
-//	while(HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,buff,5) != HAL_OK);
-//	HAL_UART_Transmit_IT(&huart3,(uint8_t*)"H100 OK\r\n",9);
+
 }
 void sendResponse(uint8_t bed,uint8_t command,uint8_t response){
 

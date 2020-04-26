@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 
-STMotorHandle_t STMotorDevices[4];
+STMotorHandle_t STMotorDevices[1];
 
 STMotorDeviceControl_t STMotorDeviceControl = {
 	SetDirectionGPIO,

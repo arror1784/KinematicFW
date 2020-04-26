@@ -14,6 +14,7 @@
 
 uint8_t deviceCount = 0;
 uint8_t endStopSignal = FALSE;
+int8_t endStopCheckingBouncing = -1;
 //extern HAL_UART_StateTypeDef huart2;
 
 bool STMotorInitControl(void){
@@ -29,14 +30,13 @@ bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handl
 	STMotorHandle->motorHandler.timChaanel = channel;
 	STMotorHandle->motorHandler.deviceNumber = deviceCount++;
 	STMotorHandle->motorHandler.isActivate = FALSE;
+	STMotorHandle->motorHandler.autoHoming = FALSE;
 	STMotorHandle->motorHandler.timPrescaler = MOTOR_PRESCALER;
 	STMotorHandle->motorHandler.IRQn = IRQn;
 	STMotorHandle->motorHandler.port = MOTOR_END_GPIO_Port;
 	STMotorHandle->motorHandler.pin = MOTOR_END_Pin;
 
 	endStopSignal = FALSE;
-//	HAL_NVIC_DisableIRQ(STMotorHandle->motorHandler.IRQn);
-//	HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
 
 	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 	return TRUE;
@@ -186,14 +186,12 @@ uint32_t STMotorSetFreq(STMotorHandle_t* STMotorHandle,uint32_t freq){
 
 uint32_t STMotorStopFreq(STMotorHandle_t* STMotorHandle){
 	HAL_TIM_PWM_Stop_IT(STMotorHandle->motorHandler.timHandle,STMotorHandle->motorHandler.timChaanel);
-
-	STMotorDeviceControl.FinishCallBack(STMotorHandle);
 	return 0;
 }
 
 uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step,uint8_t mode){
 
-	if(STMotorHandle->motorHandler.isActivate == FALSE){
+	if(STMotorHandle->motorHandler.isActivate == FALSE && STMotorHandle->motorHandler.autoHoming == FALSE){
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(step == 0){
 			STMotorHandle->motorHandler.isActivate = FALSE;
@@ -239,7 +237,7 @@ uint32_t STMotorMoveStart(STMotorHandle_t* STMotorHandle){
 
 uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int32_t speed,uint16_t timeOut){
 
-	if(STMotorHandle->motorHandler.isActivate == FALSE){
+	if(STMotorHandle->motorHandler.isActivate == FALSE && STMotorHandle->motorHandler.autoHoming == FALSE){
 		STMotorHandle->motorHandler.isActivate = TRUE;
 		if(speed == 0){
 			STMotorHandle->motorHandler.isActivate = FALSE;
@@ -254,6 +252,7 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int32_t speed,uint16_t ti
 		STMotorHandle->motorParam.startDecel = 0;
 		STMotorHandle->motorParam.targetStep = 0;
 		STMotorHandle->motorParam.nStep = 0;
+		STMotorHandle->motorParam.curSpeed = speed;
 
 		STMotorHandle->motorParam.state = STATE_INFINITE;
 		STMotorSetFreq(STMotorHandle,abs(speed));
@@ -265,9 +264,8 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int32_t speed,uint16_t ti
 }
 
 uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,int32_t speed){
-	if(STMotorHandle->motorHandler.isActivate == FALSE){
+	if(STMotorHandle->motorHandler.isActivate == FALSE && STMotorHandle->motorHandler.autoHoming == FALSE){
 		if(HAL_GPIO_ReadPin(STMotorHandle->motorHandler.port,STMotorHandle->motorHandler.pin)){
-//			STMotorHandle->motorHandler.isActivate = FALSE;
 			__HAL_GPIO_EXTI_CLEAR_IT(STMotorHandle->motorHandler.pin);
 //			HAL_NVIC_EnableIRQ(STMotorHandle->motorHandler.IRQn);
 			endStopSignal = TRUE;
@@ -279,6 +277,7 @@ uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,int32_t speed){
 			}else{
 				STMotorGoSpeed(STMotorHandle,speed,0);
 			}
+			STMotorHandle->motorHandler.autoHoming = TRUE;
 			return 0;
 		}else{
 			STMotorHandle->motorParam.state = STATE_STOP;
@@ -315,7 +314,7 @@ uint32_t STMotorSoftStop(STMotorHandle_t* STMotorHandle){
 
 uint32_t STMotorWaitingActivate(STMotorHandle_t* STMotorHandle,uint32_t timeOut){
 	uint32_t startMilli = HAL_GetTick();
-	while(STMotorHandle->motorHandler.isActivate == TRUE){
+	while(STMotorHandle->motorHandler.isActivate == TRUE && STMotorHandle->motorHandler.autoHoming == TRUE){
 		if(timeOut == 0){
 			continue;
 		}else if(HAL_GetTick() > startMilli + timeOut){
@@ -382,7 +381,6 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 		decel = STMotorHandle->motorParam.decel << 16;
 
 	}
-
 
 	bool speedUpdated = FALSE;
 
@@ -462,21 +460,26 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			STMotorHandle->motorParam.curPosition += (relStep + 1) * ((STMotorHandle->motorParam.direction) ? 1 : -1);
 			STMotorHandle->motorParam.nStep = 0;
 			STMotorHandle->motorParam.targetStep = 0;
-			STMotorHandle->motorHandler.isActivate = FALSE;
 			STMotorHandle->motorParam.state = STATE_STOP;
 			STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 			STMotorStopFreq(STMotorHandle);
+			STMotorHandle->motorHandler.isActivate = FALSE;
+			STMotorDeviceControl.FinishCallBack(STMotorHandle);
+
 			break;
 		case STATE_FINISH_AUTO_HOME:
-			if(!(--STMotorHandle->motorParam.targetStep)){
+//			if(!(--STMotorHandle->motorParam.targetStep)){
 				STMotorHandle->motorParam.state = STATE_STOP;
 				STMotorHandle->motorParam.nStep = 0;
 				STMotorHandle->motorParam.targetStep = 0;
 				STMotorHandle->motorHandler.isActivate = FALSE;
 				STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 				STMotorStopFreq(STMotorHandle);
+
+				endStopCheckingBouncing = STMotorHandle->motorHandler.deviceNumber;
+
 				STMotorSetHome(STMotorHandle);
-			}
+//			}
 		default:
 			break;
 	}
@@ -486,21 +489,49 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 
 uint32_t STMotorEXTInterruptHandle(STMotorHandle_t* STMotorHandle){
 //	HAL_NVIC_DisableIRQ(STMotorHandle->motorHandler.IRQn);
-	endStopSignal = FALSE;
+//	endStopSignal = FALSE;
 //	STMotorHardStop(STMotorHandle);
-	STMotorHandle->motorParam.targetStep = (MOTOR_MOTOR_STEP * MOTOR_MICRO_STEP) / 2 - 1;
+
+//	STMotorHandle->motorParam.targetStep = (MOTOR_MOTOR_STEP * MOTOR_MICRO_STEP) / 2;
 	STMotorHandle->motorParam.state = STATE_FINISH_AUTO_HOME;
+
+//	STMotorHardStop(STMotorHandle);
+
 //	STMotorSetHome(STMotorHandle);
 	return 0;
 }
 
+void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle){
+	static uint32_t TK = 0;
+	int currentTime = 0;
+	static int F = 0;
 
+	if(!F){
+		TK = HAL_GetTick();
+		F=1;
+	}else{
+		currentTime = HAL_GetTick();
+		if((currentTime - TK) >= 1000){
+			if(!HAL_GPIO_ReadPin(STMotorHandle->motorHandler.port,STMotorHandle->motorHandler.pin)){
+				endStopSignal = FALSE;
+				endStopCheckingBouncing = -1;
+				F=0;
+				STMotorDeviceControl.FinishCallBack(STMotorHandle);
+				STMotorHandle->motorHandler.autoHoming = FALSE;
 
+				while(HAL_UART_Transmit(&huart3,"sucess\r\n",8,1000) != HAL_OK);
+			}else{
+				STMotorHandle->motorHandler.autoHoming = FALSE;
+				STMotorGoSpeed(STMotorHandle,STMotorHandle->motorParam.curSpeed,0);
+				STMotorHandle->motorHandler.autoHoming = TRUE;
 
-
-
-
-
+				while(HAL_UART_Transmit(&huart3,"fail\r\n",6,1000) != HAL_OK);
+				endStopCheckingBouncing = -1;
+				F=0;
+			}
+		}
+	}
+}
 
 
 

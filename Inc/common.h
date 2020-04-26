@@ -29,6 +29,7 @@
 #define MOTOR_SCREW_PITCH				2000 // unit : micro
 #define MOTOR_SCREW_PITCH_MIL			2
 
+typedef uint8_t                        bool;
 
 typedef enum{
 
@@ -67,6 +68,7 @@ typedef struct{
 	GPIO_TypeDef* port;
 	uint16_t pin;
 	volatile bool isActivate;
+	volatile bool autoHoming;
 
 	volatile uint32_t timPrescaler;
 

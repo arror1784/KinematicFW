@@ -78,14 +78,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BOOT_Pin GPIO_PIN_1
+#define BOOT_GPIO_Port GPIOC
 #define FRT_BTN_Pin GPIO_PIN_3
 #define FRT_BTN_GPIO_Port GPIOC
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
-#define BUZZER_Pin GPIO_PIN_6
-#define BUZZER_GPIO_Port GPIOA
 #define DEBUG_RX_Pin GPIO_PIN_5
 #define DEBUG_RX_GPIO_Port GPIOC
 #define DEBUG_TX_Pin GPIO_PIN_10
@@ -94,23 +90,21 @@ void Error_Handler(void);
 #define UV_LED_SIDE_GPIO_Port GPIOB
 #define UV_LED_MIDDLE_Pin GPIO_PIN_15
 #define UV_LED_MIDDLE_GPIO_Port GPIOB
-#define FNT_LED_Pin GPIO_PIN_6
-#define FNT_LED_GPIO_Port GPIOC
+#define FRT_LED_Pin GPIO_PIN_6
+#define FRT_LED_GPIO_Port GPIOC
 #define MOTOR_END_Pin GPIO_PIN_9
 #define MOTOR_END_GPIO_Port GPIOC
 #define MOTOR_END_EXTI_IRQn EXTI9_5_IRQn
-#define MOTOR_STEP_Pin GPIO_PIN_8
-#define MOTOR_STEP_GPIO_Port GPIOA
+#define MOTOR_ENDA8_Pin GPIO_PIN_8
+#define MOTOR_ENDA8_GPIO_Port GPIOA
 #define MOTOR_EN_Pin GPIO_PIN_10
 #define MOTOR_EN_GPIO_Port GPIOA
 #define MOTOR_DIR_Pin GPIO_PIN_11
 #define MOTOR_DIR_GPIO_Port GPIOA
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
-#define SWO_Pin GPIO_PIN_3
-#define SWO_GPIO_Port GPIOB
+#define UV_LED_PWM_Pin GPIO_PIN_6
+#define UV_LED_PWM_GPIO_Port GPIOB
+#define COOLING_PWM_Pin GPIO_PIN_8
+#define COOLING_PWM_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

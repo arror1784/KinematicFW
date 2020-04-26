@@ -39,8 +39,6 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-
 #include "main.h"
 #include "dma.h"
 #include "tim.h"
@@ -75,7 +73,6 @@
 
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart2_rx;
-extern STMotorHandle_t STMotorDevices[1];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,11 +93,9 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  uint8_t buff[100] = {0};
-  HGCodeDataControl_t* temp = 0;
-  uint32_t commandCount = 0;
-
-
+	  uint8_t buff[100] = {0};
+	  HGCodeDataControl_t* temp = 0;
+	  uint32_t commandCount = 0;
   /* USER CODE END 1 */
   
 
@@ -131,10 +126,17 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM11_Init();
   MX_TIM7_Init();
+  MX_TIM14_Init();
+  MX_TIM4_Init();
+  MX_TIM10_Init();
+  MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit_IT(&huart3,(uint8_t*)"boot board\r\n",12);
 
   HAL_TIM_Base_Start_IT(&htim11); //touch timer
+  HAL_TIM_Base_Start_IT(&htim14); //endStop Debouncing
+
+  HAL_TIM_PWM_Stop_IT(&htim12,TIM_CHANNEL_2);
 
   STMotorInitHandler(&STMotorDevices[0],&htim1,(HAL_TIM_ActiveChannel)TIM_CHANNEL_1,EXTI9_5_IRQn);
   STMotorInitParam(&STMotorDevices[0],STMotorCalcMicroToStep(60000 / 60),STMotorCalcMicroToStep(45000 / 60),STMotorCalcMicroToStep(600000 / 60),1);
@@ -158,12 +160,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  STMotorWaitingActivate(&STMotorDevices[0],0);
-//	  STMotorSetAccelSpeed(&STMotorDevices[0],5244,1);
-//	  STMotorGoMicro(&STMotorDevices[0],100000,1);
-//	  STMotorWaitingActivate(&STMotorDevices[0],0);
-//	  STMotorGoMicro(&STMotorDevices[0],-10000,0);
-
 	  if(HGCodeCheckDataBuffer() == 1){
 			temp = HGCodeGetCommandData();
 
@@ -183,11 +179,12 @@ int main(void)
 				case 03:
 					G03(temp);
 					break;
+				case 27:
+					G27(temp);
+					break;
 				case 28:
 					G28(temp);
 					break;
-				case 27:
-					G27(temp);
 				default:
 					break;
 				}
@@ -198,6 +195,9 @@ int main(void)
 					break;
 				case 11:
 					H11(temp);
+					break;
+				case 12:
+					H12(temp);
 					break;
 				case 20:
 					H20(temp);
@@ -247,7 +247,6 @@ int main(void)
 			}
 				memset(temp,0x00,sizeof(HGCodeDataControl_t));
 		}
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

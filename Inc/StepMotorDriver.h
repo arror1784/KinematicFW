@@ -43,6 +43,8 @@ void FinishCallBack(STMotorHandle_t *STMotorHandle);
 void PWMPulseInterruptHandle(TIM_HandleTypeDef *htim);
 void EXTInterruptHandle(BtnChannel_t btn);
 
+extern STMotorHandle_t STMotorDevices[1];
+
 //#endif
 
 #endif /* STPMT_INC_STEPMOTORDRIVER_H_ */

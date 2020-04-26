@@ -19,6 +19,7 @@
 
 extern STMotorDeviceControl_t STMotorDeviceControl;
 extern uint8_t endStopSignal;
+extern int8_t endStopCheckingBouncing;
 
 bool STMotorInitControl(void);
 bool STMotorInitHandler(STMotorHandle_t* STMotorHandle,TIM_HandleTypeDef* Handle,HAL_TIM_ActiveChannel Chaanel,IRQn_Type IRQn);
@@ -83,5 +84,7 @@ double STMotorCalcMicroToRotation(int32_t micro);
 
 uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle);
 uint32_t STMotorEXTInterruptHandle(STMotorHandle_t* STMotorHandle);
+void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle);
+
 
 #endif /* STPMT_INC_PWMSTEPMOTOR_H_ */

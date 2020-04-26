@@ -37,35 +37,39 @@
 
 void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
 
-void G01(HGCodeDataControl_t* temp);
-void G02(HGCodeDataControl_t* temp);
-void G03(HGCodeDataControl_t* temp);
-void G04(HGCodeDataControl_t* temp);
-void G05(HGCodeDataControl_t* temp);
-void G27(HGCodeDataControl_t* temp);
-void G28(HGCodeDataControl_t* temp);
-void G30(HGCodeDataControl_t* temp);
-void G31(HGCodeDataControl_t* temp);
-void G99(HGCodeDataControl_t* temp);
+void G01(HGCodeDataControl_t* temp); // go micro relative
+void G02(HGCodeDataControl_t* temp); // go absolute
+void G03(HGCodeDataControl_t* temp); // go step
+void G04(HGCodeDataControl_t* temp); // null
+void G05(HGCodeDataControl_t* temp); // null
+void G27(HGCodeDataControl_t* temp); // go home
+void G28(HGCodeDataControl_t* temp); // set home
+void G30(HGCodeDataControl_t* temp); // null
+void G31(HGCodeDataControl_t* temp); // null
+void G99(HGCodeDataControl_t* temp); // null
 
-void H01(HGCodeDataControl_t* temp);
-void H05(HGCodeDataControl_t* temp);
-void H10(HGCodeDataControl_t* temp);
-void H11(HGCodeDataControl_t* temp);
-void H20(HGCodeDataControl_t* temp);
-void H21(HGCodeDataControl_t* temp);
-void H30(HGCodeDataControl_t* temp);
-void H31(HGCodeDataControl_t* temp);
-void H32(HGCodeDataControl_t* temp);
-void H33(HGCodeDataControl_t* temp);
+void H01(HGCodeDataControl_t* temp); // null
+void H05(HGCodeDataControl_t* temp); // null
+void H10(HGCodeDataControl_t* temp); // UV LED off
+void H11(HGCodeDataControl_t* temp); // UV LED on
+void H12(HGCodeDataControl_t* temp); // SET UV LED PWM
+void H20(HGCodeDataControl_t* temp); // UV COOLER OFF
+void H21(HGCodeDataControl_t* temp); // UV COOLER ON
+void H22(HGCodeDataControl_t* temp); // SET UV COOLER PWM
 
-void H40(HGCodeDataControl_t* temp);
-void H41(HGCodeDataControl_t* temp);
-void H42(HGCodeDataControl_t* temp);
-void H43(HGCodeDataControl_t* temp);
-void H50(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P);
-void H51(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P);
-void H60(HGCodeDataControl_t* temp);
+void H30(HGCodeDataControl_t* temp); // set MAX SPEED
+void H31(HGCodeDataControl_t* temp); // set MIN SPEED
+void H32(HGCodeDataControl_t* temp); // set ACCEL SPEED
+void H33(HGCodeDataControl_t* temp); // set DECEL SPEED
+
+void H40(HGCodeDataControl_t* temp); //null
+void H41(HGCodeDataControl_t* temp); //null
+void H42(HGCodeDataControl_t* temp); //null
+void H43(HGCodeDataControl_t* temp); //null
+void H44(HGCodeDataControl_t* temp); //null
+void H50(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P); // neopixel
+void H51(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P); // blank neopixel
+void H60(HGCodeDataControl_t* temp); // null
 
 void H100(HGCodeDataControl_t* temp); // check
 
