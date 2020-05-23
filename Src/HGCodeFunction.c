@@ -209,7 +209,10 @@ void H60(HGCodeDataControl_t* temp){
 //	HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
 }
 void H100(HGCodeDataControl_t* temp){
-
+	return;
+}
+void H101(HGCodeDataControl_t* temp){
+	return;
 }
 void sendResponse(uint8_t bed,uint8_t command,uint8_t response){
 
