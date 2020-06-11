@@ -50,8 +50,10 @@
 #include "HGCodeFunction.h"
 #include "StepMotorDriver.h"
 #include "PWMStepMotor.h"
+#include "PrinterStateControl.h"
 #include "usart.h"
 #include "neoPixel.h"
+#include "common.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,9 +95,9 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	  uint8_t buff[100] = {0};
-	  HGCodeDataControl_t* temp = 0;
-	  uint32_t commandCount = 0;
+	uint8_t buff[100] = {0};
+	HGCodeDataControl_t* temp = 0;
+	uint32_t commandCount = 0;
   /* USER CODE END 1 */
   
 
@@ -145,14 +147,15 @@ int main(void)
 
   setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10,&htim7);
 
-//  HAL_TIM_Base_Start_IT(&htim7); //blank timer
+  HAL_TIM_Base_Start_IT(&htim7); //blank timer
 
+  powerOff();
 
-  for(int i = 0 ; i < neoPixel_P->ledCount; i++){
-	  setColor(neoPixel_P,converColorTo32((uint8_t)0,(uint8_t)0,(uint8_t)0),i);
-  }
-  updateColor(neoPixel_P,0);
-//  HAL_TIM_PWM_Start_IT(&htim3,TIM_CHANNEL_1);
+//  HAL_TIM_PWM_Start(&htim13,TIM_CHANNEL_1);
+//  for(int i = 0 ; i < neoPixel_P->ledCount; i++){
+//	  setColor(neoPixel_P,converColorTo32((uint8_t)0,(uint8_t)0,(uint8_t)0),i);
+//  }
+//  updateColor(neoPixel_P,0);
 
   /* USER CODE END 2 */
 
@@ -238,6 +241,8 @@ int main(void)
 				case 100:
 					H100(temp);
 					break;
+				case 200:
+					H200(temp);
 				case 60:
 					H60(temp);
 					break;

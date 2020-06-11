@@ -55,7 +55,8 @@ typedef enum{
 typedef enum{
 	BTN_END = 1,
 	BTN_FRT_SHORT,
-	BTN_FRT_LONG
+	BTN_FRT_LONG,
+	BTN_FRT_LONG_LONG
 }BtnChannel_t;
 
 typedef struct{

@@ -42,6 +42,7 @@
 #include "StepMotorDriver.h"
 #include "PWMStepMotor.h"
 #include "HGCodeFunction.h"
+#include "PrinterStateControl.h"
 #include "neoPixel.h"
 #include "common.h"
 #include "usart.h"
@@ -56,6 +57,7 @@
 /* USER CODE BEGIN PD */
 #define DEBOUNCING_SHORT_TIME 10
 #define DEBOUNCING_LONG_TIME 150
+#define DEBOUNCING_LONG_LONG_TIME 500
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -71,7 +73,6 @@ volatile uint32_t end_before_time = 0;
 volatile uint32_t count = 0;
 volatile uint32_t TIM7count = 0;
 volatile uint8_t blankFlag = 0;
-
 
 /* USER CODE END PV */
 
@@ -320,33 +321,32 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_TRG_COM_TIM11_IRQn 0 */
 	if(count == 0){
-		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_RESET){
+		if(HAL_GPIO_ReadPin(FRT_BUTTON_GPIO_Port,FRT_BUTTON_Pin) == GPIO_PIN_RESET){
 			count = 1;
 		}
 	}else if(count == DEBOUNCING_SHORT_TIME){
-		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) == GPIO_PIN_RESET){
+		if(HAL_GPIO_ReadPin(FRT_BUTTON_GPIO_Port,FRT_BUTTON_Pin) == GPIO_PIN_RESET){
 			count += 1;
 		}else{
 			count = 0;
 		}
 	}else{
 		count += 1;
-		if(HAL_GPIO_ReadPin(FRT_BTN_GPIO_Port,FRT_BTN_Pin) != GPIO_PIN_RESET){
-			if(count > DEBOUNCING_SHORT_TIME && count < DEBOUNCING_LONG_TIME){
-				EXTInterruptHandle(BTN_FRT_SHORT);
+		if(HAL_GPIO_ReadPin(FRT_BUTTON_GPIO_Port,FRT_BUTTON_Pin) != GPIO_PIN_RESET){
+			if(count > DEBOUNCING_SHORT_TIME && count < DEBOUNCING_LONG_TIME){ //short
+				controlPowerStateBTN(BTN_FRT_SHORT);
 				count = 0;
-			}else if(count > DEBOUNCING_LONG_TIME){
-				EXTInterruptHandle(BTN_FRT_LONG);
+			}else if(count > DEBOUNCING_LONG_LONG_TIME){
+				controlPowerStateBTN(BTN_FRT_LONG_LONG);
+				count = 0;
+			}else if(count > DEBOUNCING_LONG_TIME){ // long
+				controlPowerStateBTN(BTN_FRT_LONG);
 				count = 0;
 			}
 		}
 	}
-//		if(count > 10 && count < 150){
-//			EXTInterruptHandle(BTN_FRT_SHORT);
-//		}else if(count >= 150){
-//			EXTInterruptHandle(BTN_FRT_LONG);
-//		}
-//		count = 0;
+
+
 
   /* USER CODE END TIM1_TRG_COM_TIM11_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
@@ -427,6 +427,20 @@ void USART3_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles EXTI line[15:10] interrupts.
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+  /* USER CODE END EXTI15_10_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM8 break interrupt and TIM12 global interrupt.
   */
 void TIM8_BRK_TIM12_IRQHandler(void)
@@ -491,7 +505,13 @@ void TIM6_DAC_IRQHandler(void)
 void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
-	NPEXITHandle(&neoPixel);
+//	NPEXITHandle(&neoPixel);
+//	if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_SET){
+//		HAL_UART_Transmit(&huart3,(uint8_t*)"LCD error\r\n",11,1000);
+//	}
+//	else{
+//		HAL_UART_Transmit(&huart3,(uint8_t*)"LCD ON\r\n",8,1000);
+//	}
   /* USER CODE END TIM7_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */
@@ -501,8 +521,18 @@ void TIM7_IRQHandler(void)
 
 /* USER CODE BEGIN 1 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+
+	if(GPIO_Pin == GPIO_PIN_11){
+		if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_SET){
+			HAL_UART_Transmit(&huart3,(uint8_t*)"LCD OFF\r\n",9,1000);
+		}else
+		if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_RESET){
+			HAL_UART_Transmit(&huart3,(uint8_t*)"LCD ON\r\n",8,1000);
+		}
+	}
+
 //	HAL_UART_Transmit_IT(&huart2,"end stop interrupt\r\n",40);
-	EXTInterruptHandle((BtnChannel_t)GPIO_Pin);
+//	EXTInterruptHandle((BtnChannel_t)GPIO_Pin);
 }
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

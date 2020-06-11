@@ -507,10 +507,14 @@ void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle){
 	static int F = 0;
 
 	if(!F){
+
 		TK = HAL_GetTick();
 		F=1;
+
 	}else{
+
 		currentTime = HAL_GetTick();
+
 		if((currentTime - TK) >= 1000){
 			if(!HAL_GPIO_ReadPin(STMotorHandle->motorHandler.port,STMotorHandle->motorHandler.pin)){
 				endStopSignal = FALSE;
@@ -530,6 +534,7 @@ void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle){
 				F=0;
 			}
 		}
+
 	}
 }
 

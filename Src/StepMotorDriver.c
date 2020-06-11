@@ -95,14 +95,16 @@ void EXTInterruptHandle(BtnChannel_t btn){
 		STMotorEXTInterruptHandle(&STMotorDevices[0]);
 		HAL_UART_Transmit(&huart3,(uint8_t*)"end stop\r\n",10,1000);
 		break;
-	case BTN_FRT_SHORT:
-//		HAL_UART_Transmit(&huart2,response,8,1000);
-		sendResponse(0,102,100);
-		HAL_UART_Transmit(&huart3,(uint8_t*)"BTN SHORT\r\n",11,1000);
-		break;
-	case BTN_FRT_LONG:
-		sendResponse(0,103,100);
-		HAL_UART_Transmit(&huart3,(uint8_t*)"BTN LONG\r\n",10,1000);
+//	case BTN_FRT_SHORT:
+//		sendResponse(0,102,100);
+//		HAL_UART_Transmit(&huart3,(uint8_t*)"BTN SHORT\r\n",11,1000);
+//		break;
+//	case BTN_FRT_LONG:
+//		sendResponse(0,103,100);
+//		HAL_UART_Transmit(&huart3,(uint8_t*)"BTN LONG\r\n",10,1000);
+//	case BTN_FRT_LONG_LONG:
+//		sendResponse(0,104,100);
+//		HAL_UART_Transmit(&huart3,(uint8_t*)"BTN LONG\r\n",10,1000);
 	}
 
 }

@@ -6,6 +6,7 @@
  */
 #include "HGCodeFunction.h"
 #include "StepMotorDriver.h"
+#include "PrinterStateControl.h"
 #include "string.h"
 #include "tim.h"
 #include "neoPixel.h"
@@ -102,6 +103,7 @@ void H11(HGCodeDataControl_t* temp){ //UV LED ON
 void H12(HGCodeDataControl_t* temp){ //SET UV LED PWM
 	__HAL_TIM_SET_COMPARE(&htim12, TIM_CHANNEL_2, temp->HGCodeParameter.A);
 }
+
 void H20(HGCodeDataControl_t* temp){ //UV COOLER OFF
 	HAL_TIM_Base_Stop_IT(&htim10);
 }
@@ -111,7 +113,6 @@ void H21(HGCodeDataControl_t* temp){ //UV COOLER ON
 void H22(HGCodeDataControl_t* temp){ //SET UV COOLER PWM
 	__HAL_TIM_SET_COMPARE(&htim10, TIM_CHANNEL_1, temp->HGCodeParameter.A);
 }
-
 //H3x : 입력값 : 분당 밀리미터 단위
 void H30(HGCodeDataControl_t* temp){ //SET MAX SPEED
 	if(temp->HGCodeParameter.A){
@@ -213,6 +214,9 @@ void H100(HGCodeDataControl_t* temp){
 }
 void H101(HGCodeDataControl_t* temp){
 	return;
+}
+void H200(HGCodeDataControl_t* temp){
+	softPowerOff();
 }
 void sendResponse(uint8_t bed,uint8_t command,uint8_t response){
 
