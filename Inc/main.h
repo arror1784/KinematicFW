@@ -105,7 +105,6 @@ void Error_Handler(void);
 #define MOTOR_DIR_GPIO_Port GPIOA
 #define LCD_CHECK_Pin GPIO_PIN_11
 #define LCD_CHECK_GPIO_Port GPIOC
-#define LCD_CHECK_EXTI_IRQn EXTI15_10_IRQn
 #define FRT_BUTTON_Pin GPIO_PIN_12
 #define FRT_BUTTON_GPIO_Port GPIOC
 #define UV_LED_PWM_Pin GPIO_PIN_6

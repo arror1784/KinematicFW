@@ -99,7 +99,6 @@ int main(void)
 	HGCodeDataControl_t* temp = 0;
 	uint32_t commandCount = 0;
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -139,6 +138,8 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim14); //endStop Debouncing
 
   HAL_TIM_PWM_Stop_IT(&htim12,TIM_CHANNEL_2);
+
+//  HAL_TIM_PWM_Start(&htim12,TIM_CHANNEL_2);
 
   STMotorInitHandler(&STMotorDevices[0],&htim1,(HAL_TIM_ActiveChannel)TIM_CHANNEL_1,EXTI9_5_IRQn);
   STMotorInitParam(&STMotorDevices[0],STMotorCalcMicroToStep(60000 / 60),STMotorCalcMicroToStep(45000 / 60),STMotorCalcMicroToStep(600000 / 60),1);
