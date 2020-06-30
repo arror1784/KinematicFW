@@ -71,8 +71,8 @@ void H50(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P); // neopixel
 void H51(HGCodeDataControl_t* temp,WS2812BControl_p neoPixel_P); // blank neopixel
 void H60(HGCodeDataControl_t* temp); // null
 
-void H100(HGCodeDataControl_t* temp); // MCU power check
-void H101(HGCodeDataControl_t* temp); // LCD power check
+void H90(HGCodeDataControl_t* temp); // MCU power check
+void H91(HGCodeDataControl_t* temp); // LCD power check
 
 void H200(HGCodeDataControl_t* temp); // receive power off siganl
 

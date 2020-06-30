@@ -146,10 +146,11 @@ int main(void)
 
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
 
-  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10,&htim7);
+//  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10,&htim7);
 
   HAL_TIM_Base_Start_IT(&htim7); //blank timer
 
+//  powerOn();
   powerOff();
 
 //  HAL_TIM_PWM_Start(&htim13,TIM_CHANNEL_1);
@@ -157,7 +158,6 @@ int main(void)
 //	  setColor(neoPixel_P,converColorTo32((uint8_t)0,(uint8_t)0,(uint8_t)0),i);
 //  }
 //  updateColor(neoPixel_P,0);
-
 
   /* USER CODE END 2 */
 
@@ -240,11 +240,15 @@ int main(void)
 				case 51:
 					H51(temp,neoPixel_P);
 					break;
-				case 100:
-					H100(temp);
+				case 90:
+					H90(temp);
+					break;
+				case 91:
+					H91(temp);
 					break;
 				case 200:
 					H200(temp);
+					break;
 				case 60:
 					H60(temp);
 					break;

@@ -468,7 +468,7 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 
 			break;
 		case STATE_FINISH_AUTO_HOME:
-//			if(!(--STMotorHandle->motorParam.targetStep)){
+
 				STMotorHandle->motorParam.state = STATE_STOP;
 				STMotorHandle->motorParam.nStep = 0;
 				STMotorHandle->motorParam.targetStep = 0;
@@ -479,7 +479,6 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 				endStopCheckingBouncing = STMotorHandle->motorHandler.deviceNumber;
 
 				STMotorSetHome(STMotorHandle);
-//			}
 		default:
 			break;
 	}

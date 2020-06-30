@@ -332,17 +332,16 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
 		}
 	}else{
 		count += 1;
+
+		if(count == DEBOUNCING_SHORT_TIME /*&& count < DEBOUNCING_LONG_TIME*/){ //short
+			controlPowerStateBTN(BTN_FRT_SHORT);
+		}else if(count ==DEBOUNCING_LONG_TIME){ // long
+			controlPowerStateBTN(BTN_FRT_LONG);
+		}else if(count == DEBOUNCING_LONG_LONG_TIME){
+			controlPowerStateBTN(BTN_FRT_LONG_LONG);
+		}
 		if(HAL_GPIO_ReadPin(FRT_BUTTON_GPIO_Port,FRT_BUTTON_Pin) != GPIO_PIN_RESET){
-			if(count > DEBOUNCING_SHORT_TIME && count < DEBOUNCING_LONG_TIME){ //short
-				controlPowerStateBTN(BTN_FRT_SHORT);
-				count = 0;
-			}else if(count > DEBOUNCING_LONG_LONG_TIME){
-				controlPowerStateBTN(BTN_FRT_LONG_LONG);
-				count = 0;
-			}else if(count > DEBOUNCING_LONG_TIME){ // long
-				controlPowerStateBTN(BTN_FRT_LONG);
-				count = 0;
-			}
+			count = 0;
 		}
 	}
 
@@ -510,10 +509,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
 	if(GPIO_Pin == GPIO_PIN_11){
 		if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_SET){
+
 			HAL_UART_Transmit(&huart3,(uint8_t*)"LCD OFF\r\n",9,1000);
-		}else
-		if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_RESET){
+			sendResponse(0,91,0);
+
+		}else if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_RESET){
+
 			HAL_UART_Transmit(&huart3,(uint8_t*)"LCD ON\r\n",8,1000);
+			sendResponse(0,91,1);
+
 		}
 	}
 

@@ -209,10 +209,16 @@ void H60(HGCodeDataControl_t* temp){
 //	sprintf(buff,"current position %ld \r\n",STMotorDevices[0].motorParam.curPosition);
 //	HAL_UART_Transmit(HGCodeControl.HGCodeUartHandle,(uint8_t*)buff,20,1000);
 }
-void H100(HGCodeDataControl_t* temp){
+void H90(HGCodeDataControl_t* temp){
 	return;
 }
-void H101(HGCodeDataControl_t* temp){
+void H91(HGCodeDataControl_t* temp){
+	if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_SET){
+		sendResponse(0,91,0);
+	}else{
+		sendResponse(0,91,1);
+	}
+
 	return;
 }
 void H200(HGCodeDataControl_t* temp){
