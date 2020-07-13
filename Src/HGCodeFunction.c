@@ -221,6 +221,11 @@ void H91(HGCodeDataControl_t* temp){
 
 	return;
 }
+void H101(HGCodeDataControl_t* temp){
+	HAL_UART_Transmit(&huart3,"reboot\r\n",8,1000);
+
+	NVIC_SystemReset();
+}
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();
 }

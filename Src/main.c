@@ -63,7 +63,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define APPLICATION_ADDRESS (uint32_t) 0x08004000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -132,7 +132,10 @@ int main(void)
   MX_TIM10_Init();
   MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Transmit_IT(&huart3,(uint8_t*)"boot board\r\n",12);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"boot board\r\n",12,1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"version 1 \r\n",12,1000);
+
+//  HAL_UART_Transmit_IT(&huart2,(uint8_t*)"boot board\r\n",12);
 
   HAL_TIM_Base_Start_IT(&htim11); //touch timer
   HAL_TIM_Base_Start_IT(&htim14); //endStop Debouncing
@@ -148,6 +151,7 @@ int main(void)
 
 //  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10,&htim7);
 
+
   HAL_TIM_Base_Start_IT(&htim7); //blank timer
 
 //  powerOn();
@@ -160,6 +164,7 @@ int main(void)
 //  updateColor(neoPixel_P,0);
 
   /* USER CODE END 2 */
+
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -245,6 +250,9 @@ int main(void)
 					break;
 				case 91:
 					H91(temp);
+					break;
+				case 101:
+					H101(temp);
 					break;
 				case 200:
 					H200(temp);

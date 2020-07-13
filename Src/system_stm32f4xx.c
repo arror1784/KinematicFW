@@ -106,7 +106,7 @@
 /*!< Uncomment the following line if you need to relocate your vector Table in
      Internal SRAM. */
 /* #define VECT_TAB_SRAM */
-#define VECT_TAB_OFFSET  0x00 /*!< Vector Table base offset field. 
+#define VECT_TAB_OFFSET  0x4000 /*!< Vector Table base offset field.
                                    This value must be a multiple of 0x200. */
 /******************************************************************************/
 
@@ -201,7 +201,7 @@ void SystemInit(void)
 }
 
 /**
-   * @brief  Update SystemCoreClock variable according to Clock Register Values.
+   * @brief  Update SystemCoreClock variable according to Clock Reg	ister Values.
   *         The SystemCoreClock variable contains the core clock (HCLK), it can
   *         be used by the user application to setup the SysTick timer or configure
   *         other parameters.

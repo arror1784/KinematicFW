@@ -74,6 +74,8 @@ void H60(HGCodeDataControl_t* temp); // null
 void H90(HGCodeDataControl_t* temp); // MCU power check
 void H91(HGCodeDataControl_t* temp); // LCD power check
 
+void H101(HGCodeDataControl_t* temp);
+
 void H200(HGCodeDataControl_t* temp); // receive power off siganl
 
 void sendResponse(uint8_t bed,uint8_t commnad,uint8_t response);
