@@ -54,6 +54,8 @@
 #include "usart.h"
 #include "neoPixel.h"
 #include "common.h"
+#include "menu.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -270,6 +272,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
   }
+  Main_Menu();
   /* USER CODE END 3 */
 }
 

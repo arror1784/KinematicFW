@@ -222,9 +222,18 @@ void H91(HGCodeDataControl_t* temp){
 	return;
 }
 void H101(HGCodeDataControl_t* temp){
-	HAL_UART_Transmit(&huart3,"reboot\r\n",8,1000);
+	pFunction Jump_To_Application;
+	uint32_t JumpAddress;
+	HAL_UART_Transmit(&huart3,"IAPr\n",5,1000);
 
-	NVIC_SystemReset();
+	JumpAddress = *(__IO uint32_t*) ((uint32_t)0x08000000 + 4);
+	/* Jump to user application */
+	Jump_To_Application = (pFunction) JumpAddress;
+	/* Initialize user application's Stack Pointer */
+	__set_MSP(*(__IO uint32_t*) (uint32_t)0x08000000);
+	Jump_To_Application();
+
+	//	NVIC_SystemReset();
 }
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();

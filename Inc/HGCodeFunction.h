@@ -35,6 +35,8 @@
 
 }HGCodeFunction_t;*/
 
+typedef  void (*pFunction)(void);
+
 void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
 
 void G01(HGCodeDataControl_t* temp); // go micro relative
