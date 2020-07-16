@@ -29,12 +29,14 @@
 /* Private variables ---------------------------------------------------------*/
 typedef  void (*pFunction)(void);
 
-/* Exported types -----------------------------										-------------------------------*/
+/* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void Main_Menu(void);
 int SerialDownload(void);
+int SerialDownload_update(void);
+int SerialDownload_backup(void);
 
 #endif  /* __MENU_H */
 

@@ -35,7 +35,6 @@
 /* Exported constants --------------------------------------------------------*/
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbyte */
-
 #define ADDR_FLASH_SECTOR_1     ((uint32_t)0x08004000) /* Base @ of Sector 1, 16 Kbyte */
 #define ADDR_FLASH_SECTOR_2     ((uint32_t)0x08008000) /* Base @ of Sector 2, 16 Kbyte */
 #define ADDR_FLASH_SECTOR_3     ((uint32_t)0x0800C000) /* Base @ of Sector 3, 16 Kbyte */
@@ -43,7 +42,6 @@
 #define ADDR_FLASH_SECTOR_5     ((uint32_t)0x08020000) /* Base @ of Sector 5, 128 Kbyte */
 #define ADDR_FLASH_SECTOR_6     ((uint32_t)0x08040000) /* Base @ of Sector 6, 128 Kbyte */
 #define ADDR_FLASH_SECTOR_7     ((uint32_t)0x08060000) /* Base @ of Sector 7, 128 Kbyte */
-
 #define ADDR_FLASH_SECTOR_8     ((uint32_t)0x08080000) /* Base @ of Sector 8, 128 Kbyte */
 #define ADDR_FLASH_SECTOR_9     ((uint32_t)0x080A0000) /* Base @ of Sector 9, 128 Kbyte */
 #define ADDR_FLASH_SECTOR_10    ((uint32_t)0x080C0000) /* Base @ of Sector 10, 128 Kbyte */
@@ -51,7 +49,7 @@
 
 /* End of the Flash address */
 #if defined(STM32F401xE) || defined(STM32F411xE) || defined(STM32F446xx)
-//  #define USER_FLASH_END_ADDRESS        0x0807FFFF
+  #define USER_FLASH_END_ADDRESS        0x0807FFFF
 #else
   #define USER_FLASH_END_ADDRESS        0x080FFFFF
 #endif
@@ -60,36 +58,39 @@
 #define BACKUP_FlASH_END_ADDRESS		0x0807FFFF
 
 /* Define the user application size */
+#define USER_FLASH_SIZE   (USER_FLASH_END_ADDRESS - APPLICATION_ADDRESS + 1)
+
 #define MAIN_FLASH_SIZE   (MAIN_FLASH_END_ADDRESS - MAIN_APPLICATION_ADDRESS + 1)
 #define BACKUP_FLASH_SUZE (BACKUP_FlASH_END_ADDRESS - BACKUP_APPLICATION_ADDRESS + 1)
+
 /* Define the address from where user application will be loaded.
    Note: the 1st sector 0x08000000-0x08003FFF is reserved for the IAP code */
+#define APPLICATION_ADDRESS   (uint32_t)0x08004000 
+
 #define MAIN_APPLICATION_ADDRESS   						(uint32_t)0x08004000
-#define LAST_MAIN_APPLICATION_ADDRESS_FLASH_SECTOR_NN 	ADDR_FLASH_SECTOR_5
+#define LAST_MAIN_APPLICATION_ADDRESS_FLASH_SECTOR_NN 	FLASH_SECTOR_5
 
 #define BACKUP_APPLICATION_ADDRESS 						(uint32_t)0x08040000
-#define LAST_BACKUP_APPLICATION_ADDRESS_FLASH_SECTOR_NN ADDR_FLASH_SECTOR_7
-
+#define LAST_BACKUP_APPLICATION_ADDRESS_FLASH_SECTOR_NN FLASH_SECTOR_7
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void FLASH_If_Init(void);
-//uint32_t FLASH_If_Erase(uint32_t StartSector);
+uint32_t FLASH_If_Erase(uint32_t StartSector);
 uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data, uint32_t DataLength);
 uint16_t FLASH_If_GetWriteProtectionStatus(void);
 uint32_t FLASH_If_DisableWriteProtection(void);
 
 uint32_t FLASH_If_BACKUP_Erase(uint32_t StartSector);
 uint32_t FLASH_If_MAIN_Erase(uint32_t StartSector);
-
 /* added by jrkim ------------------------------------------------------------*/
 //
-// Flash sector¿¡¼­ ¸¶Áö¸· ¼³Á¤
-// stm32f4xx_hal_flash_ex.h ÂüÁ¶
+// Flash sectorï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// stm32f4xx_hal_flash_ex.h ï¿½ï¿½ï¿½ï¿½
 //
 #ifdef USE_HAL_DRIVER
 #if defined(STM32F401xE) || defined(STM32F411xE) || defined(STM32F446xx)
-//  #define LAST_FLASH_SECTOR_NN    FLASH_SECTOR_7
+  #define LAST_FLASH_SECTOR_NN    FLASH_SECTOR_7
 #elif defined(STM32F401xC)
   #define LAST_FLASH_SECTOR_NN    FLASH_SECTOR_5
 #elif defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx)|| defined(STM32F439xx) ||\

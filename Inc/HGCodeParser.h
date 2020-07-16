@@ -113,6 +113,8 @@ void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeD
 //void HGCodeDMASetBuffer(int8_t *,uint16_t);
 
 void HGCodeDMAStart(void);
+void HGCodeDMAPause(void);
+void HGCodeDMAResume(void);
 
 int8_t HGCodeCheckCommandBuffer(void);
 int8_t HGCodeCheckDataBuffer(void);

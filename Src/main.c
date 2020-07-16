@@ -54,8 +54,11 @@
 #include "usart.h"
 #include "neoPixel.h"
 #include "common.h"
-#include "menu.h"
 
+#include "menu.h"
+#include "LAPSRCcommon.h"
+#include "ymodem.h"
+#include "flash_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -100,6 +103,10 @@ int main(void)
 	uint8_t buff[100] = {0};
 	HGCodeDataControl_t* temp = 0;
 	uint32_t commandCount = 0;
+
+	uint32_t t=0;
+	uint8_t k=0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -135,7 +142,7 @@ int main(void)
   MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit(&huart3,(uint8_t*)"boot board\r\n",12,1000);
-  HAL_UART_Transmit(&huart3,(uint8_t*)"version 1 \r\n",12,1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"version 8 for new iap\r\n",23,1000);
 
 //  HAL_UART_Transmit_IT(&huart2,(uint8_t*)"boot board\r\n",12);
 
@@ -158,6 +165,23 @@ int main(void)
 
 //  powerOn();
   powerOff();
+//	HGCodeDMAPause();
+//	while(1){
+//	  if((HAL_GetTick() - t) < 3000){
+//		   if(SerialKeyPressed(&k)){
+//			   HAL_UART_Transmit(&huart3,"BTN press\r\n",11,1000);
+//			   if(SerialDownload_backup() == 0){
+//				   break;
+//			   }else{
+//	//			   NVIC_SystemReset();
+//				   break;
+//			   }
+//		   }
+//	  }else{
+//		  break;
+//	  }
+//	}
+//	HGCodeDMAResume();
 
 //  HAL_TIM_PWM_Start(&htim13,TIM_CHANNEL_1);
 //  for(int i = 0 ; i < neoPixel_P->ledCount; i++){
@@ -166,7 +190,6 @@ int main(void)
 //  updateColor(neoPixel_P,0);
 
   /* USER CODE END 2 */
-
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -259,6 +282,9 @@ int main(void)
 				case 200:
 					H200(temp);
 					break;
+				case 201:
+					H201(temp);
+					break;
 				case 60:
 					H60(temp);
 					break;
@@ -272,7 +298,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
   }
-  Main_Menu();
+//  Main_Menu();
   /* USER CODE END 3 */
 }
 

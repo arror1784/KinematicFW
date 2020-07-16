@@ -1,4 +1,4 @@
-/**
+/*
   ******************************************************************************
   * @file    STM32F4xx_IAP/src/ymodem.c 
   * @author  MCD Application Team
@@ -26,7 +26,7 @@
   
 /* Includes ------------------------------------------------------------------*/
 #include "flash_if.h"
-#include "common.h"
+#include "LAPSRCcommon.h"
 #include "ymodem.h"
 #include "string.h"
 
@@ -137,10 +137,146 @@ static int32_t Receive_Packet (uint8_t *data, int32_t *length, uint32_t timeout)
   * @param  buf: Address of the first byte.
   * @retval The size of the file.
   */
-
-
 int32_t Ymodem_Receive (uint8_t *buf)
 {
+  uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD], file_size[FILE_SIZE_LENGTH], *file_ptr, *buf_ptr;
+  int32_t i, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
+  volatile uint32_t flashdestination, ramsource, flash_err;        /* modified by jrkim */
+
+  /* Initialize flashdestination variable */
+  flashdestination = APPLICATION_ADDRESS;
+
+  for (session_done = 0, errors = 0, session_begin = 0; ;)
+  {
+    for (packets_received = 0, file_done = 0, buf_ptr = buf; ;)
+    {
+      switch (Receive_Packet(packet_data, &packet_length, NAK_TIMEOUT))
+      {
+        case 0:
+          errors = 0;
+          switch (packet_length)
+          {
+            /* Abort by sender */
+            case - 1:
+              Send_Byte(ACK);
+              return 0;
+            /* End of transmission */
+            case 0:
+              Send_Byte(ACK);
+              file_done = 1;
+              break;
+            /* Normal packet */
+            default:
+              if ((packet_data[PACKET_SEQNO_INDEX] & 0xff) != (packets_received & 0xff))
+              {
+                Send_Byte(NAK);
+              }
+              else
+              {
+                if (packets_received == 0)
+                {
+                  /* Filename packet */
+                  if (packet_data[PACKET_HEADER] != 0)
+                  {
+                    /* Filename packet has valid data */
+                    for (i = 0, file_ptr = packet_data + PACKET_HEADER; (*file_ptr != 0) && (i < FILE_NAME_LENGTH);)
+                    {
+                      FileName[i++] = *file_ptr++;
+                    }
+                    FileName[i++] = '\0';
+                    for (i = 0, file_ptr ++; (*file_ptr != ' ') && (i < FILE_SIZE_LENGTH);)
+                    {
+                      file_size[i++] = *file_ptr++;
+                    }
+                    file_size[i++] = '\0';
+                    Str2Int(file_size, &size);
+
+                    /* Test the size of the image to be sent */
+                    /* Image size is greater than Flash size */
+                    if (size > (USER_FLASH_SIZE + 1))
+                    {
+                      /* End session */
+                      Send_Byte(CA);
+                      Send_Byte(CA);
+                      return -1;
+                    }
+                    /* erase user application area */
+                    flash_err = FLASH_If_Erase(APPLICATION_ADDRESS);
+                    if (flash_err != 0) {
+                      /* End session */
+                      Send_Byte(CA);
+                      Send_Byte(CA);
+                      return -3;
+                    }
+
+                    Send_Byte(ACK);
+                    Send_Byte(CRC16);
+                  }
+                  /* Filename packet is empty, end session */
+                  else
+                  {
+                    Send_Byte(ACK);
+                    file_done = 1;
+                    session_done = 1;
+                    break;
+                  }
+                }
+                /* Data packet */
+                else
+                {
+                  memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
+                  ramsource = (uint32_t)buf;
+
+                  /* Write received data in Flash */
+                  if (FLASH_If_Write(&flashdestination, (uint32_t*) ramsource, (uint16_t) packet_length/4)  == 0)
+                  {
+                    Send_Byte(ACK);
+                  }
+                  else /* An error occurred while writing to Flash memory */
+                  {
+                    /* End session */
+                    Send_Byte(CA);
+                    Send_Byte(CA);
+                    return -2;
+                  }
+                }
+                packets_received ++;
+                session_begin = 1;
+              }
+          }
+          break;
+        case 1:
+          Send_Byte(CA);
+          Send_Byte(CA);
+          return -3;
+        default:
+          if (session_begin > 0)
+          {
+            errors ++;
+          }
+          if (errors > MAX_ERRORS)
+          {
+            Send_Byte(CA);
+            Send_Byte(CA);
+            return 0;
+          }
+          Send_Byte(CRC16);
+          break;
+      }
+      if (file_done != 0)
+      {
+        break;
+      }
+    }
+    if (session_done != 0)
+    {
+      break;
+    }
+  }
+  return (int32_t)size;
+}
+
+int32_t Ymodem_Receive_backup (uint8_t *buf){
   uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD], file_size[FILE_SIZE_LENGTH], *file_ptr, *buf_ptr;
   int32_t i, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
   volatile uint32_t flashdestination, ramsource, flash_err;        /* modified by jrkim */
@@ -278,10 +414,11 @@ int32_t Ymodem_Receive (uint8_t *buf)
   return (int32_t)size;
 }
 
-int32_t backup_application_Receive (){
+int32_t backup_application_Receive ()
+{
 
 	volatile uint32_t flashdestination, ramsource, flash_err, length, rt;        /* modified by jrkim */
-//	uint8_t *buf_ptr = buf;
+  //	uint8_t *buf_ptr = buf;
 	/* Initialize flashdestination variable */
 
 	flashdestination = MAIN_APPLICATION_ADDRESS;
@@ -290,34 +427,180 @@ int32_t backup_application_Receive (){
 	flash_err = FLASH_If_MAIN_Erase(MAIN_APPLICATION_ADDRESS);
 	if (flash_err != 0) {
 		/* End session */
-		Send_Byte(CA);
-		Send_Byte(CA);
-		return -3;
+		HAL_UART_Transmit(&huart3,"main erase error\r\n",18,1000);
+		return -1;
+	}else{
+		HAL_UART_Transmit(&huart3,"main erase sucess\r\n",19,1000);
 	}
-//	for(int i=0 ;  ; i++){
-//		memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
+
 	ramsource = (uint32_t)BACKUP_APPLICATION_ADDRESS;
 
 	length = (uint32_t)MAIN_FLASH_SIZE;
 
 	/* Write received data in Flash */
-	rt = FLASH_If_Write(&flashdestination, (uint32_t*)ramsource, length);
+	rt = FLASH_If_Write(&flashdestination, (uint32_t*)ramsource, length / 4);
     FLASH_WaitForLastOperation(1000);
-
 	if (rt  == 0)
 	{
-//			Send_Byte(ACK);
+		HAL_UART_Transmit(&huart3,"main erase sucess\r\n",19,1000);
 	}
 	else /* An error occurred while writing to Flash memory */
 	{
 		/* End session */
-//		Send_Byte(CA);
-//		Send_Byte(CA);
+		HAL_UART_Transmit(&huart3,"main write error\r\n",18,1000);
 		return -2;
 	}
-//	}
+
+    flash_err = FLASH_If_BACKUP_Erase(BACKUP_APPLICATION_ADDRESS);
+    if (flash_err != 0) {
+    		/* End session */
+    	HAL_UART_Transmit(&huart3,"backup erase error\r\n",20,1000);
+    	return -3;
+    }else{
+    	HAL_UART_Transmit(&huart3,"backup erase sucess\r\n",21,1000);
+    }
+
 	return (int32_t)length;
 }
+
+int32_t Ymodem_Receive_update (uint8_t *buf){
+	uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD], file_size[FILE_SIZE_LENGTH], *file_ptr, *buf_ptr;
+	  int32_t i, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
+	  volatile uint32_t flashdestination, ramsource, flash_err;        /* modified by jrkim */
+
+	  /* Initialize flashdestination variable */
+	  flashdestination = MAIN_APPLICATION_ADDRESS;
+
+	  for (session_done = 0, errors = 0, session_begin = 0; ;)
+	  {
+	    for (packets_received = 0, file_done = 0, buf_ptr = buf; ;)
+	    {
+	      switch (Receive_Packet(packet_data, &packet_length, NAK_TIMEOUT))
+	      {
+	        case 0:
+	          errors = 0;
+	          switch (packet_length)
+	          {
+	            /* Abort by sender */
+	            case - 1:
+	              Send_Byte(ACK);
+	              return 0;
+	            /* End of transmission */
+	            case 0:
+	              Send_Byte(ACK);
+	              file_done = 1;
+	              break;
+	            /* Normal packet */
+	            default:
+	              if ((packet_data[PACKET_SEQNO_INDEX] & 0xff) != (packets_received & 0xff))
+	              {
+	                Send_Byte(NAK);
+	              }
+	              else
+	              {
+	                if (packets_received == 0)
+	                {
+	                  /* Filename packet */
+	                  if (packet_data[PACKET_HEADER] != 0)
+	                  {
+	                    /* Filename packet has valid data */
+	                    for (i = 0, file_ptr = packet_data + PACKET_HEADER; (*file_ptr != 0) && (i < FILE_NAME_LENGTH);)
+	                    {
+	                      FileName[i++] = *file_ptr++;
+	                    }
+	                    FileName[i++] = '\0';
+	                    for (i = 0, file_ptr ++; (*file_ptr != ' ') && (i < FILE_SIZE_LENGTH);)
+	                    {
+	                      file_size[i++] = *file_ptr++;
+	                    }
+	                    file_size[i++] = '\0';
+	                    Str2Int(file_size, &size);
+
+	                    /* Test the size of the image to be sent */
+	                    /* Image size is greater than Flash size */
+	                    if (size > (MAIN_FLASH_SIZE + 1))
+	                    {
+	                      /* End session */
+	                      Send_Byte(CA);
+	                      Send_Byte(CA);
+	                      return -1;
+	                    }
+	                    /* erase user application area */
+	                    flash_err = FLASH_If_MAIN_Erase(MAIN_APPLICATION_ADDRESS);
+	                    if (flash_err != 0) {
+	                      /* End session */
+	                      Send_Byte(CA);
+	                      Send_Byte(CA);
+	                      return -3;
+	                    }
+
+	                    Send_Byte(ACK);
+	                    Send_Byte(CRC16);
+	                  }
+	                  /* Filename packet is empty, end session */
+	                  else
+	                  {
+	                    Send_Byte(ACK);
+	                    file_done = 1;
+	                    session_done = 1;
+	                    break;
+	                  }
+	                }
+	                /* Data packet */
+	                else
+	                {
+	                  memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
+	                  ramsource = (uint32_t)buf;
+
+	                  /* Write received data in Flash */
+	                  if (FLASH_If_Write(&flashdestination, (uint32_t*) ramsource, (uint16_t) packet_length/4)  == 0)
+	                  {
+	                    Send_Byte(ACK);
+	                  }
+	                  else /* An error occurred while writing to Flash memory */
+	                  {
+	                    /* End session */
+	                    Send_Byte(CA);
+	                    Send_Byte(CA);
+	                    return -2;
+	                  }
+	                }
+	                packets_received ++;
+	                session_begin = 1;
+	              }
+	          }
+	          break;
+	        case 1:
+	          Send_Byte(CA);
+	          Send_Byte(CA);
+	          return -3;
+	        default:
+	          if (session_begin > 0)
+	          {
+	            errors ++;
+	          }
+	          if (errors > MAX_ERRORS)
+	          {
+	            Send_Byte(CA);
+	            Send_Byte(CA);
+	            return 0;
+	          }
+	          Send_Byte(CRC16);
+	          break;
+	      }
+	      if (file_done != 0)
+	      {
+	        break;
+	      }
+	    }
+	    if (session_done != 0)
+	    {
+	      break;
+	    }
+	  }
+	  return (int32_t)size;
+}
+
 /**
   * @brief  check response using the ymodem protocol
   * @param  buf: Address of the first byte
@@ -598,7 +881,7 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
         {
            buf_ptr += pktSize;  
            size -= pktSize;
-           if (blkNumber == (MAIN_FLASH_SIZE/1024))
+           if (blkNumber == (USER_FLASH_SIZE/1024))
            {
              return 0xFF; /*  error */
            }

@@ -4,6 +4,7 @@
  *  Created on: 2019. 2. 15.
  *      Author: JeonSeungHwan
  */
+#include <LAPSRCcommon.h>
 #include "HGCodeFunction.h"
 #include "StepMotorDriver.h"
 #include "PrinterStateControl.h"
@@ -11,6 +12,9 @@
 #include "tim.h"
 #include "neoPixel.h"
 #include "usart.h"
+
+#include "menu.h"
+#include "LAPSRCcommon.h"
 
 extern HGCodeControl_t HGCodeControl;
 
@@ -222,21 +226,45 @@ void H91(HGCodeDataControl_t* temp){
 	return;
 }
 void H101(HGCodeDataControl_t* temp){
-	pFunction Jump_To_Application;
-	uint32_t JumpAddress;
-	HAL_UART_Transmit(&huart3,"IAPr\n",5,1000);
 
-	JumpAddress = *(__IO uint32_t*) ((uint32_t)0x08000000 + 4);
-	/* Jump to user application */
-	Jump_To_Application = (pFunction) JumpAddress;
-	/* Initialize user application's Stack Pointer */
-	__set_MSP(*(__IO uint32_t*) (uint32_t)0x08000000);
-	Jump_To_Application();
-
-	//	NVIC_SystemReset();
+	int8_t k=0;
+	uint8_t buf[10] = {0};
+	HGCodeDMAPause();
+//	while (1){
+//		if(SerialKeyPressed(&k)){
+	k = SerialDownload_backup();
+	if(k == 0){
+		sprintf(buf,"%d\r\n",k);
+		HAL_UART_Transmit(&huart3,"YMODEM SUCESS\r\n",15,1000);
+		HAL_UART_Transmit(&huart3,buf,10,1000);
+//		break;
+	}else{
+		sprintf(buf,"%d\r\n",k);
+		HAL_UART_Transmit(&huart3,"YMODEM ERROR\r\n",14,1000);
+		HAL_UART_Transmit(&huart3,buf,10,1000);
+//		break;
+	}
+//		}
+//	}
+	HGCodeDMAResume();
+	HAL_UART_Transmit(&huart3,"YMODEM FINISH\r\n",15,1000);
+//	pFunction Jump_To_Application;
+//	uint32_t JumpAddress;
+//	HAL_UART_Transmit(&huart3,"IAPr\n",5,1000);
+//
+//	JumpAddress = *(__IO uint32_t*) ((uint32_t)0x08000000 + 4);
+//	/* Jump to user application */
+//	Jump_To_Application = (pFunction) JumpAddress;
+//	/* Initialize user application's Stack Pointer */
+//	__set_MSP(*(__IO uint32_t*) (uint32_t)0x08000000);
+//	Jump_To_Application();
 }
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();
+}
+void H201(HGCodeDataControl_t* temp){
+	softPowerOff();
+	NVIC_SystemReset();
 }
 void sendResponse(uint8_t bed,uint8_t command,uint8_t response){
 

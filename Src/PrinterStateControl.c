@@ -34,8 +34,8 @@ void powerOff(){
 }
 void softPowerOff(){
 	lk = 0;
-	HAL_UART_Transmit(&huart3,(uint8_t*)"POWER OFF after 12 sec\r\n",11,1000);
-	HAL_Delay(15000);
+	HAL_UART_Transmit(&huart3,(uint8_t*)"POWER OFF after 17 sec\r\n",11,1000);
+	HAL_Delay(17000);
 	HAL_GPIO_WritePin(BOOT_GPIO_Port,BOOT_Pin,GPIO_PIN_RESET);
 	HAL_TIM_PWM_Stop(&htim10,TIM_CHANNEL_1);
 	setPowerState(POWER_OFF);

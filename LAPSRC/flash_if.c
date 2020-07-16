@@ -25,6 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "flash_if2.h"
+#include "flash_if.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -63,58 +64,57 @@ void FLASH_If_Init(void)
   * @retval 0: user flash area successfully erased
   *         1: error occurred
   */
-//uint32_t FLASH_If_Erase(uint32_t StartSector)
-//{
-//#ifdef USE_HAL_DRIVER
-//  __IO uint32_t UserStartSector = FLASH_SECTOR_1;
-//#else
-//  __IO uint32_t UserStartSector = FLASH_Sector_1;
-//#endif
-//
-//  uint32_t i = 0;
-//
-//  /* Get the sector where start the user flash area */
-//  UserStartSector = GetSector(APPLICATION_ADDRESS);
-//
-//#ifdef USE_HAL_DRIVER
-//  // stm32f411xe ´Â FLASH_SECTOR_xx°¡ 0~7 ±îÁö
-//  //FLASH_EraseInitTypeDef eraseInitStruct;
-//  uint32_t err;
-//
-//  HAL_FLASH_Unlock();
-//
-//  for(i = UserStartSector; i <= LAST_FLASH_SECTOR_NN; i += 1)
-//  {
-//    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
-//       be done by word */
-//    FLASH_Erase_Sector(i, FLASH_VOLTAGE_RANGE_3);
-//    FLASH_WaitForLastOperation(1000);
-//
-//    err = HAL_FLASH_GetError();
-//    if (err != 0) {
-//      HAL_FLASH_Lock();
-//
-//      return (err);
-//    }
-//  }
-//
-//  HAL_FLASH_Lock();
-//#else
-//  for(i = UserStartSector; i <= FLASH_Sector_11; i += 8)
-//  {
-//    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
-//       be done by word */
-//    if (FLASH_EraseSector(i, VoltageRange_3) != FLASH_COMPLETE)
-//    {
-//      /* Error occurred while page erase */
-//      return (1);
-//    }
-//  }
-//#endif
-//
-//  return (0);
-//}
+uint32_t FLASH_If_Erase(uint32_t StartSector)
+{
+#ifdef USE_HAL_DRIVER
+  __IO uint32_t UserStartSector = FLASH_SECTOR_1;
+#else
+  __IO uint32_t UserStartSector = FLASH_Sector_1;
+#endif
+  
+  uint32_t i = 0;
 
+  /* Get the sector where start the user flash area */
+  UserStartSector = GetSector(APPLICATION_ADDRESS);
+
+#ifdef USE_HAL_DRIVER
+  // stm32f411xe ï¿½ï¿½ FLASH_SECTOR_xxï¿½ï¿½ 0~7 ï¿½ï¿½ï¿½ï¿½
+  //FLASH_EraseInitTypeDef eraseInitStruct;
+  uint32_t err;
+
+  HAL_FLASH_Unlock();
+  
+  for(i = UserStartSector; i <= LAST_FLASH_SECTOR_NN; i += 1)
+  {
+    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
+       be done by word */ 
+    FLASH_Erase_Sector(i, FLASH_VOLTAGE_RANGE_3);
+    FLASH_WaitForLastOperation(1000);
+
+    err = HAL_FLASH_GetError();
+    if (err != 0) {
+      HAL_FLASH_Lock();
+
+      return (err);
+    }
+  }
+  
+  HAL_FLASH_Lock();
+#else
+  for(i = UserStartSector; i <= FLASH_Sector_11; i += 8)
+  {
+    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
+       be done by word */ 
+    if (FLASH_EraseSector(i, VoltageRange_3) != FLASH_COMPLETE)
+    {
+      /* Error occurred while page erase */
+      return (1);
+    }
+  }
+#endif
+  
+  return (0);
+}
 
 uint32_t FLASH_If_BACKUP_Erase(uint32_t StartSector){
 #ifdef USE_HAL_DRIVER
@@ -129,7 +129,7 @@ uint32_t FLASH_If_BACKUP_Erase(uint32_t StartSector){
   UserStartSector = GetSector(BACKUP_APPLICATION_ADDRESS);
 
 #ifdef USE_HAL_DRIVER
-  // stm32f411xe ´Â FLASH_SECTOR_xx°¡ 0~7 ±îÁö
+  // stm32f411xe ï¿½ï¿½ FLASH_SECTOR_xxï¿½ï¿½ 0~7 ï¿½ï¿½ï¿½ï¿½
   //FLASH_EraseInitTypeDef eraseInitStruct;
   uint32_t err;
 
@@ -180,7 +180,7 @@ uint32_t FLASH_If_MAIN_Erase(uint32_t StartSector){
   UserStartSector = GetSector(MAIN_APPLICATION_ADDRESS);
 
 #ifdef USE_HAL_DRIVER
-  // stm32f411xe ´Â FLASH_SECTOR_xx°¡ 0~7 ±îÁö
+  // stm32f411xe ï¿½ï¿½ FLASH_SECTOR_xxï¿½ï¿½ 0~7 ï¿½ï¿½ï¿½ï¿½
   //FLASH_EraseInitTypeDef eraseInitStruct;
   uint32_t err;
 
@@ -217,6 +217,7 @@ uint32_t FLASH_If_MAIN_Erase(uint32_t StartSector){
 
   return (0);
 }
+
 /**
   * @brief  This function writes a data buffer in flash (data are 32-bit aligned).
   * @note   After writing data buffer, the flash content is checked.
@@ -236,7 +237,7 @@ uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data, uint32_t Da
   HAL_FLASH_Unlock();
 #endif
   
-  for (i = 0; (i < DataLength) && (*FlashAddress <= (MAIN_FLASH_END_ADDRESS-4)); i++)
+  for (i = 0; (i < DataLength) && (*FlashAddress <= (USER_FLASH_END_ADDRESS-4)); i++)
   {
     /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
        be done by word */ 
@@ -290,7 +291,7 @@ uint16_t FLASH_If_GetWriteProtectionStatus(void)
 #endif
 
   /* Get the sector where start the user flash area */
-  UserStartSector = GetSector(MAIN_APPLICATION_ADDRESS);
+  UserStartSector = GetSector(APPLICATION_ADDRESS);
 
   /* Check if there are write protected sectors inside the user flash area */
   if ((FLASH_OB_GetWRP() >> (UserStartSector/8)) == (0xFFF >> (UserStartSector/8)))
@@ -318,7 +319,7 @@ uint32_t FLASH_If_DisableWriteProtection(void)
 #endif
 
   /* Get the sector where start the user flash area */
-  UserStartSector = GetSector(MAIN_APPLICATION_ADDRESS);
+  UserStartSector = GetSector(APPLICATION_ADDRESS);
 
   /* Mark all sectors inside the user flash area as non protected */  
   UserWrpSectors = 0xFFF-((1 << (UserStartSector/8))-1);
@@ -428,7 +429,7 @@ static uint32_t GetSector(uint32_t Address)
 #if defined(FLASH_SECTOR_8)
     sector = FLASH_SECTOR_8;
 #else
-    sector = LAST_MAIN_APPLICATION_ADDRESS_FLASH_SECTOR_NN;
+    sector = LAST_FLASH_SECTOR_NN;
 #endif
 #else
     sector = FLASH_Sector_8;
@@ -440,7 +441,7 @@ static uint32_t GetSector(uint32_t Address)
 #if defined(FLASH_SECTOR_9)
     sector = FLASH_SECTOR_9;
 #else
-    sector = LAST_MAIN_APPLICATION_ADDRESS_FLASH_SECTOR_NN;
+    sector = LAST_FLASH_SECTOR_NN;
 #endif
 #else
     sector = FLASH_Sector_9;
@@ -452,7 +453,7 @@ static uint32_t GetSector(uint32_t Address)
 #if defined(FLASH_SECTOR_10)
     sector = FLASH_SECTOR_10;
 #else
-    sector = LAST_MAIN_APPLICATION_ADDRESS_FLASH_SECTOR_NN;
+    sector = LAST_FLASH_SECTOR_NN;
 #endif
 #else
     sector = FLASH_Sector_10;
@@ -464,7 +465,7 @@ static uint32_t GetSector(uint32_t Address)
 #if defined(FLASH_SECTOR_11)
     sector = FLASH_SECTOR_11;
 #else
-    sector = LAST_MAIN_APPLICATION_ADDRESS_FLASH_SECTOR_NN;
+    sector = LAST_FLASH_SECTOR_NN;
 #endif
 #else
     sector = FLASH_Sector_11;

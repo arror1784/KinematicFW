@@ -36,6 +36,14 @@ void HGCodeDMAStart(void){
 	HAL_UART_Receive_DMA(HGCodeControl.HGCodeUartHandle,HGCodeBuffer,(int)MAX_HGCODE_BUFFER);
 }
 
+void HGCodeDMAPause(void){
+	HAL_UART_DMAPause(HGCodeControl.HGCodeUartHandle);
+
+}
+void HGCodeDMAResume(void){
+	HAL_UART_DMAResume(HGCodeControl.HGCodeUartHandle);
+}
+
 int8_t HGCodeCheckCommandBuffer(void){
 	if(HGCodeControl.HGCodeBufferControl.rear == MAX_HGCODE_BUFFER - __HAL_DMA_GET_COUNTER(HGCodeControl.HGCodeDmaHandle)){
 		return 0;
