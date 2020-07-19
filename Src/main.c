@@ -142,7 +142,7 @@ int main(void)
   MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit(&huart3,(uint8_t*)"boot board\r\n",12,1000);
-  HAL_UART_Transmit(&huart3,(uint8_t*)"version 8 for new iap\r\n",23,1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"version 11 for new iap\r\n",24,1000);
 
 //  HAL_UART_Transmit_IT(&huart2,(uint8_t*)"boot board\r\n",12);
 
@@ -158,36 +158,11 @@ int main(void)
 
   startHGCode(&htim6,&huart2,&hdma_usart2_rx);
 
-//  setNeoPixel(neoPixel_P,&htim3,TIM_CHANNEL_1,&hdma_tim3_ch1_trig,10,&htim7);
-
-
   HAL_TIM_Base_Start_IT(&htim7); //blank timer
 
 //  powerOn();
   powerOff();
-//	HGCodeDMAPause();
-//	while(1){
-//	  if((HAL_GetTick() - t) < 3000){
-//		   if(SerialKeyPressed(&k)){
-//			   HAL_UART_Transmit(&huart3,"BTN press\r\n",11,1000);
-//			   if(SerialDownload_backup() == 0){
-//				   break;
-//			   }else{
-//	//			   NVIC_SystemReset();
-//				   break;
-//			   }
-//		   }
-//	  }else{
-//		  break;
-//	  }
-//	}
-//	HGCodeDMAResume();
 
-//  HAL_TIM_PWM_Start(&htim13,TIM_CHANNEL_1);
-//  for(int i = 0 ; i < neoPixel_P->ledCount; i++){
-//	  setColor(neoPixel_P,converColorTo32((uint8_t)0,(uint8_t)0,(uint8_t)0),i);
-//  }
-//  updateColor(neoPixel_P,0);
 
   /* USER CODE END 2 */
 
