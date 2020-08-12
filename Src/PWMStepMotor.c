@@ -38,7 +38,7 @@ bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handl
 
 	endStopSignal = FALSE;
 
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
+	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
 	return TRUE;
 }
 
@@ -176,7 +176,7 @@ uint32_t STMotorSetFreq(STMotorHandle_t* STMotorHandle,uint32_t freq){
 	uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
 	uint32_t period = (sysFreq/ (STMotorHandle->motorHandler.timPrescaler * (uint32_t)freq)) - 1;
 
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
+//	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 	__HAL_TIM_SET_AUTORELOAD(STMotorHandle->motorHandler.timHandle, period);
 	__HAL_TIM_SET_COMPARE(STMotorHandle->motorHandler.timHandle, STMotorHandle->motorHandler.timChaanel, period >> 1);
 	HAL_TIM_PWM_Start_IT(STMotorHandle->motorHandler.timHandle, STMotorHandle->motorHandler.timChaanel);
@@ -461,7 +461,7 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 			STMotorHandle->motorParam.nStep = 0;
 			STMotorHandle->motorParam.targetStep = 0;
 			STMotorHandle->motorParam.state = STATE_STOP;
-			STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
+//			STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 			STMotorStopFreq(STMotorHandle);
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			STMotorDeviceControl.FinishCallBack(STMotorHandle);
@@ -473,7 +473,7 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 				STMotorHandle->motorParam.nStep = 0;
 				STMotorHandle->motorParam.targetStep = 0;
 				STMotorHandle->motorHandler.isActivate = FALSE;
-				STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
+//				STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 				STMotorStopFreq(STMotorHandle);
 
 				endStopCheckingBouncing = STMotorHandle->motorHandler.deviceNumber;

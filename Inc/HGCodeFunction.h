@@ -63,6 +63,7 @@ void H30(HGCodeDataControl_t* temp); // set MAX SPEED
 void H31(HGCodeDataControl_t* temp); // set MIN SPEED
 void H32(HGCodeDataControl_t* temp); // set ACCEL SPEED
 void H33(HGCodeDataControl_t* temp); // set DECEL SPEED
+void H34(HGCodeDataControl_t* temp); // set motor enable
 
 void H40(HGCodeDataControl_t* temp); //null
 void H41(HGCodeDataControl_t* temp); //null

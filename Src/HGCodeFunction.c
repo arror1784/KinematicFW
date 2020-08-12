@@ -155,6 +155,16 @@ void H33(HGCodeDataControl_t* temp){ //SET DECEL SPEED
 	HAL_Delay(5);
 //	HAL_UART_Transmit_IT(HGCodeControl.HGCodeUartHandle,(uint8_t*)"H33 OK",6);
 }
+void H34(HGCodeDataControl_t* temp){ //SET motor enable
+	if(temp->HGCodeParameter.A){
+		STMotorDeviceControl.SetEnableGPIO(&STMotorDevices[0],TRUE);
+		temp->HGCodeParameter.A = 0;
+	}else{
+		STMotorDeviceControl.SetEnableGPIO(&STMotorDevices[0],FALSE);
+		temp->HGCodeParameter.A = 0;
+	}
+	HAL_Delay(5);
+}
 void H40(HGCodeDataControl_t* temp){
 //	uint8_t buff[50] = {0};
 //	if(temp->HGCodeParameter.A){

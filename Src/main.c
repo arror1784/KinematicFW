@@ -142,7 +142,9 @@ int main(void)
   MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit(&huart3,(uint8_t*)"boot board\r\n",12,1000);
-  HAL_UART_Transmit(&huart3,(uint8_t*)"version 11 for new iap\r\n",24,1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"version 17 for new iap\r\n",24,1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"LCD check pooling version\r\n",27,1000);
+  HAL_UART_Transmit(&huart3,(uint8_t*)"motor enable control by boot\r\n",30,1000);
 
 //  HAL_UART_Transmit_IT(&huart2,(uint8_t*)"boot board\r\n",12);
 
@@ -226,6 +228,9 @@ int main(void)
 					break;
 				case 33:
 					H33(temp);
+					break;
+				case 34:
+					H34(temp);
 					break;
 				case 40:
 					H40(temp);
