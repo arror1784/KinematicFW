@@ -75,7 +75,6 @@ volatile uint32_t count = 0;
 volatile uint32_t TIM7count = 0;
 volatile uint8_t blankFlag = 0;
 
-uint8_t LCDFirstCheck = 0;
 
 /* USER CODE END PV */
 
@@ -324,31 +323,7 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_TRG_COM_TIM11_IRQn 0 */
 
-	if(LCDFirstCheck == 0){
-		LCDFirstCheck = 1;
-		if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_SET){
-			setLCDState(LCD_OFF);
-		}else if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_RESET){
-			setLCDState(LCD_ON);
-		}
-	}else{
-		if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_SET){
-			if(getLCDState() == LCD_ON){
-				//lcd state change to LCD_OFF
-				sendResponse(0,91,0);
-				HAL_UART_Transmit(&huart3,(uint8_t*)"LCD OFF\r\n",9,1000);
-				setLCDState(LCD_OFF);
-			}
-		}else/* if(HAL_GPIO_ReadPin(LCD_CHECK_GPIO_Port,LCD_CHECK_Pin) == GPIO_PIN_RESET)*/
-		{
-			if(getLCDState() == LCD_OFF){
-				//lcd state change to LCD_ON
-				sendResponse(0,91,1);
-				HAL_UART_Transmit(&huart3,(uint8_t*)"LCD ON\r\n",8,1000);
-				setLCDState(LCD_ON);
-			}
-		}
-	}
+	LCDCheckEXTIHandle();
 
 	if(count == 0){
 		if(HAL_GPIO_ReadPin(FRT_BUTTON_GPIO_Port,FRT_BUTTON_Pin) == GPIO_PIN_RESET){
