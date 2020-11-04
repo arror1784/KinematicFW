@@ -7,23 +7,22 @@
 #include "StepMotorDriver.h"
 
 #include "common.h"
-#include "PWMStepMotor.h"
 #include "HGCodeFunction.h"
 #include "usart.h"
 #include <stdio.h>
 
 
 STMotorHandle_t STMotorDevices[1];
-
-STMotorDeviceControl_t STMotorDeviceControl = {
-	SetDirectionGPIO,
-	SetEnableGPIO,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	FinishCallBack
-};
+//
+//STMotorDeviceControl_t STMotorDeviceControl = {
+//	SetDirectionGPIO,
+//	SetEnableGPIO,
+//	NULL,
+//	NULL,
+//	NULL,
+//	NULL,
+//	FinishCallBack
+//};
 
 void SetDirectionGPIO(STMotorHandle_t *STMotorHandle, MotorDirection_t direction){
 	switch(STMotorHandle->motorHandler.deviceNumber){

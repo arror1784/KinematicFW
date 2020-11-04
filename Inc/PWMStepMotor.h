@@ -10,16 +10,70 @@
 
 #include <stdint.h>
 #include "common.h"
-#include "StepMotorDriver.h"
+//#include "StepMotorDriver.h"
 #include "stm32f4xx_hal.h"
 
 #ifndef MOTER_DRIVER
 #error MAKE StepMotorDriver.h/.c file or define MOTER_DRIVER
 #endif
 
-extern STMotorDeviceControl_t STMotorDeviceControl;
+//extern STMotorDeviceControl_t STMotorDeviceControl;
 extern uint8_t endStopSignal;
 extern int8_t endStopCheckingBouncing;
+
+typedef struct{
+
+	uint8_t deviceNumber;
+	TIM_HandleTypeDef* timHandle;
+	TIM_TypeDef* instance;
+	HAL_TIM_ActiveChannel timChaanel;
+	IRQn_Type IRQn;
+	GPIO_TypeDef* port;
+	uint16_t pin;
+	volatile bool isActivate;
+	volatile bool autoHoming;
+
+	volatile uint32_t timPrescaler;
+
+}PWMmotor_t;
+
+typedef struct{
+
+	volatile MotorDirection_t direction;
+	volatile MotorState_t state;
+
+	volatile int32_t curPosition; //unit : step
+	volatile uint32_t nStep;
+	volatile uint32_t targetStep;
+
+	volatile uint32_t accel;
+	volatile uint32_t decel;
+
+	volatile uint32_t accel_2;
+	volatile uint32_t decel_2;
+
+	volatile uint32_t mode;
+
+	volatile uint32_t maxSpeed;
+	volatile uint32_t minSpeed;
+
+	volatile uint32_t curSpeed;
+
+	volatile uint32_t endAccel;
+	volatile uint32_t startDecel;
+	volatile uint32_t accu;
+
+	//volatile uint8_t microStep;
+	//volatile uint8_t motorStep;
+	//volatile uint8_t screwPitch
+}STMotorParam;
+
+typedef struct{
+
+	volatile PWMmotor_t motorHandler;
+	volatile STMotorParam motorParam;
+
+}STMotorHandle_t;
 
 bool STMotorInitControl(void);
 bool STMotorInitHandler(STMotorHandle_t* STMotorHandle,TIM_HandleTypeDef* Handle,HAL_TIM_ActiveChannel Chaanel,IRQn_Type IRQn);

@@ -9,25 +9,22 @@
 #define STPMT_INC_STEPMOTORDRIVER_H_
 
 #include "common.h"
+#include "PWMStepMotor.h"
 
 //#include "PWMStepMotor.h"
 
-//#define STEP_MOTOR_DEVICE_INFO
-
-//#ifdef STEP_MOTOR_DEIVCE_INFO
-
-typedef struct{
-
-	void (*SetDirectionGPIO)(STMotorHandle_t *, MotorDirection_t);
-	void (*SetEnableGPIO)(STMotorHandle_t *, bool);
-	void (*SetSleepGPIO)(STMotorHandle_t *, bool);
-	void (*SetResetGPIO)(STMotorHandle_t *,bool);
-	void (*SetMicroStep)(STMotorHandle_t *,uint16_t);
-	void (*SetEnableIRQ)(STMotorHandle_t *,bool);
-
-	void (*FinishCallBack)(STMotorHandle_t *);
-
-}STMotorDeviceControl_t;
+//typedef struct{
+//
+//	void (*SetDirectionGPIO)(STMotorHandle_t *, MotorDirection_t);
+//	void (*SetEnableGPIO)(STMotorHandle_t *, bool);
+//	void (*SetSleepGPIO)(STMotorHandle_t *, bool);
+//	void (*SetResetGPIO)(STMotorHandle_t *,bool);
+//	void (*SetMicroStep)(STMotorHandle_t *,uint16_t);
+//	void (*SetEnableIRQ)(STMotorHandle_t *,bool);
+//
+//	void (*FinishCallBack)(STMotorHandle_t *);
+//
+//}STMotorDeviceControl_t;
 
 /// Maximum speed in step/s for device 0 (30 step/s < Maximum speed <= 10 000 step/s )
 
