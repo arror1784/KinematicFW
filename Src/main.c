@@ -36,6 +36,7 @@
   *
   ******************************************************************************
   */
+
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -48,17 +49,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "HGCodeFunction.h"
-#include "StepMotorDriver.h"
-#include "PWMStepMotor.h"
 #include "PrinterStateControl.h"
 #include "usart.h"
-#include "neoPixel.h"
 #include "common.h"
 
-#include "menu.h"
-#include "LAPSRCcommon.h"
-#include "ymodem.h"
-#include "flash_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +62,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define APPLICATION_ADDRESS (uint32_t) 0x08004000
+//#define APPLICATION_ADDRESS (uint32_t) 0x08004000
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -103,10 +98,6 @@ int main(void)
 	uint8_t buff[100] = {0};
 	HGCodeDataControl_t* temp = 0;
 	uint32_t commandCount = 0;
-
-	uint32_t t=0;
-	uint8_t k=0;
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -142,9 +133,6 @@ int main(void)
   MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Transmit(&huart3,(uint8_t*)"boot board\r\n",12,1000);
-  HAL_UART_Transmit(&huart3,(uint8_t*)"version 17 for new iap\r\n",24,1000);
-  HAL_UART_Transmit(&huart3,(uint8_t*)"LCD check pooling version\r\n",27,1000);
-  HAL_UART_Transmit(&huart3,(uint8_t*)"motor enable control by boot\r\n",30,1000);
 
 //  HAL_UART_Transmit_IT(&huart2,(uint8_t*)"boot board\r\n",12);
 
@@ -165,14 +153,13 @@ int main(void)
 //  powerOn();
   powerOff();
 
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(HGCodeCheckDataBuffer() == 1){
+	  if(HGCodeCheckDataBuffer()){
 			temp = HGCodeGetCommandData();
 
 			sprintf((char*)buff,"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d M: %d\r\n",
@@ -244,12 +231,12 @@ int main(void)
 				case 43:
 					H43(temp);
 					break;
-				case 50:
-					H50(temp,neoPixel_P);
-					break;
-				case 51:
-					H51(temp,neoPixel_P);
-					break;
+//				case 50:
+//					H50(temp,neoPixel_P);
+//					break;
+//				case 51:
+//					H51(temp,neoPixel_P);
+//					break;
 				case 90:
 					H90(temp);
 					break;

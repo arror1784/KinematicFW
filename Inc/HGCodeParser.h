@@ -107,7 +107,7 @@ typedef struct{
 
 }HGCodeState_t;
 
-
+void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
 
 void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
 //void HGCodeDMASetBuffer(int8_t *,uint16_t);

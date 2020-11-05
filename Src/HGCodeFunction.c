@@ -17,13 +17,7 @@
 
 extern HGCodeControl_t HGCodeControl;
 
-void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 
-	HGCodeInit(HGCodeUsartHandle,HGCodeDmaHandle);
-	HGCodeDMAStart();
-	HAL_TIM_Base_Start_IT(timHandler);
-
-}
 void G01(HGCodeDataControl_t* temp){
 	if(temp->HGCodeParameter.A){
 		if(!STMotorIsActivate(&STMotorDevices[0])){
@@ -157,10 +151,10 @@ void H33(HGCodeDataControl_t* temp){ //SET DECEL SPEED
 }
 void H34(HGCodeDataControl_t* temp){ //SET motor enable
 	if(temp->HGCodeParameter.A){
-		STMotorDeviceControl.SetEnableGPIO(&STMotorDevices[0],TRUE);
+		SetEnableGPIO(&STMotorDevices[0],TRUE);
 		temp->HGCodeParameter.A = 0;
 	}else{
-		STMotorDeviceControl.SetEnableGPIO(&STMotorDevices[0],FALSE);
+		SetEnableGPIO(&STMotorDevices[0],FALSE);
 		temp->HGCodeParameter.A = 0;
 	}
 	HAL_Delay(5);

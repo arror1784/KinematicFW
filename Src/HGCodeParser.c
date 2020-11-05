@@ -8,11 +8,18 @@
 #include "HGCodeParser.h"
 #include "usart.h"
 #include "string.h"
-#include "HGCodeFunction.h"
 
 uint8_t HGCodeBuffer[MAX_HGCODE_BUFFER] = {0};
 HGCodeControl_t HGCodeControl = {0};
 uint8_t buff[20] = {0};
+
+void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
+
+	HGCodeInit(HGCodeUsartHandle,HGCodeDmaHandle);
+	HGCodeDMAStart();
+	HAL_TIM_Base_Start_IT(timHandler);
+
+}
 
 void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 	HGCodeControl.HGCodeUartHandle = HGCodeUsartHandle;
@@ -52,11 +59,11 @@ int8_t HGCodeCheckCommandBuffer(void){
 	}
 }
 
-int8_t HGCodeCheckDataBuffer(void){
+bool HGCodeCheckDataBuffer(void){
 	if(HGCodeGetCommandCount() > 0){
-		return 1;
+		return TRUE;
 	}else{
-		return 0;
+		return FALSE;
 	}
 }
 
@@ -149,9 +156,9 @@ HGCodeDataControl_t* HGCodeGetCommandData(void){
 	uint8_t rear = HGCodeControl.dataRear;
 
 	if(rear == HGCodeControl.dataFront)
-		return 0;
+		return NULL;
 	if(HGCodeControl.commandCount == 0)
-		return 0;
+		return NULL;
 	HGCodeControl.dataRear = (HGCodeControl.dataRear + 1) % MAX_COMMAND;
 
 	HGCodeControl.commandCount -= 1;
