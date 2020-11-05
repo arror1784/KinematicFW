@@ -13,20 +13,7 @@
 
 //#include "PWMStepMotor.h"
 
-//typedef struct{
-//
-//	void (*SetDirectionGPIO)(STMotorHandle_t *, MotorDirection_t);
-//	void (*SetEnableGPIO)(STMotorHandle_t *, bool);
-//	void (*SetSleepGPIO)(STMotorHandle_t *, bool);
-//	void (*SetResetGPIO)(STMotorHandle_t *,bool);
-//	void (*SetMicroStep)(STMotorHandle_t *,uint16_t);
-//	void (*SetEnableIRQ)(STMotorHandle_t *,bool);
-//
-//	void (*FinishCallBack)(STMotorHandle_t *);
-//
-//}STMotorDeviceControl_t;
-
-/// Maximum speed in step/s for device 0 (30 step/s < Maximum speed <= 10 000 step/s )
+// Maximum speed in step/s for device 0 (30 step/s < Maximum speed <= 10 000 step/s )
 
 void SetDirectionGPIO(STMotorHandle_t* STMotorHandle, MotorDirection_t direction);
 void SetEnableGPIO(STMotorHandle_t* STMotorHandle, bool flag);
