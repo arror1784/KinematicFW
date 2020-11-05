@@ -37,6 +37,7 @@ void powerOff(){
 	SetEnableGPIO(&STMotorDevices[0],FALSE);
 	HAL_GPIO_WritePin(BOOT_GPIO_Port,BOOT_Pin,GPIO_PIN_RESET);
 	HAL_TIM_PWM_Stop(&htim10,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Stop(&htim12,TIM_CHANNEL_2);
 }
 void softPowerOff(){
 	lk = 0;
@@ -47,6 +48,7 @@ void softPowerOff(){
 	SetEnableGPIO(&STMotorDevices[0],FALSE);
 	HAL_GPIO_WritePin(BOOT_GPIO_Port,BOOT_Pin,GPIO_PIN_RESET);
 	HAL_TIM_PWM_Stop(&htim10,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Stop(&htim12,TIM_CHANNEL_2);
 	setPowerState(POWER_OFF);
 
 	lk = 1;
