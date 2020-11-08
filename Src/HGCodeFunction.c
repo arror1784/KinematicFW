@@ -233,8 +233,6 @@ void H101(HGCodeDataControl_t* temp){
 	int8_t k=0;
 	uint8_t buf[10] = {0};
 	HGCodeDMAPause();
-//	while (1){
-//		if(SerialKeyPressed(&k)){
 	k = SerialDownload_backup();
 	if(k == 0){
 		sprintf(buf,"%d\r\n",k);
@@ -247,20 +245,8 @@ void H101(HGCodeDataControl_t* temp){
 		HAL_UART_Transmit(&huart3,buf,10,1000);
 //		break;
 	}
-//		}
-//	}
 	HGCodeDMAResume();
 	HAL_UART_Transmit(&huart3,"YMODEM FINISH\r\n",15,1000);
-//	pFunction Jump_To_Application;
-//	uint32_t JumpAddress;
-//	HAL_UART_Transmit(&huart3,"IAPr\n",5,1000);
-//
-//	JumpAddress = *(__IO uint32_t*) ((uint32_t)0x08000000 + 4);
-//	/* Jump to user application */
-//	Jump_To_Application = (pFunction) JumpAddress;
-//	/* Initialize user application's Stack Pointer */
-//	__set_MSP(*(__IO uint32_t*) (uint32_t)0x08000000);
-//	Jump_To_Application();
 }
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();

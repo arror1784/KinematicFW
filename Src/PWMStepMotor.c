@@ -130,6 +130,10 @@ uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uin
 	uint32_t maxSpeed = STMotorHandle->motorParam.maxSpeed;
 	uint32_t acc = 0;
 	uint32_t dec = 0;
+#ifdef LOGGING
+	uint8_t buff[100] = {0};
+#endif
+
 	if(mode == 1){
 		acc = STMotorHandle->motorParam.accel_2;
 		dec = STMotorHandle->motorParam.decel_2;
@@ -170,10 +174,9 @@ uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uin
 		STMotorHandle->motorParam.startDecel = nStep - decSteps - 1;
 	}
 #ifdef LOGGING
-	uint8_t buff[100] = {0};
-	sprintf((char*)buff,"max %6d min %6d acc %6d dec %6d endAccel %6d startDecel %6d\r\n",
-			maxSpeed,minSpeed,acc,dec,STMotorHandle->motorParam.endAccel,STMotorHandle->motorParam.startDecel);
-	HAL_UART_Transmit_IT(&huart3,buff,strlen((char*)buff));
+	sprintf((char*)buff,"max %6d min %6d acc %6d dec %6d endAccel %6d startDecel %6d nStep %6d\r\n",
+			maxSpeed,minSpeed,acc,dec,STMotorHandle->motorParam.endAccel,STMotorHandle->motorParam.startDecel,nStep);
+	while(HAL_UART_Transmit(&huart3,buff,strlen((char*)buff),1000) != HAL_OK);
 #endif
 	return 0;
 }
@@ -542,6 +545,3 @@ void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle){
 
 	}
 }
-
-
-

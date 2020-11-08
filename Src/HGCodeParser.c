@@ -9,6 +9,7 @@
 #include "usart.h"
 #include "string.h"
 
+
 uint8_t HGCodeBuffer[MAX_HGCODE_BUFFER] = {0};
 HGCodeControl_t HGCodeControl = {0};
 uint8_t buff[20] = {0};
@@ -51,11 +52,11 @@ void HGCodeDMAResume(void){
 	HAL_UART_DMAResume(HGCodeControl.HGCodeUartHandle);
 }
 
-int8_t HGCodeCheckCommandBuffer(void){
+bool HGCodeCheckCommandBuffer(void){
 	if(HGCodeControl.HGCodeBufferControl.rear == MAX_HGCODE_BUFFER - __HAL_DMA_GET_COUNTER(HGCodeControl.HGCodeDmaHandle)){
-		return 0;
+		return FALSE;
 	}else{
-		return 1;
+		return TRUE;
 	}
 }
 

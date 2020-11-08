@@ -10,9 +10,11 @@
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
-#include <usart.h>
+#include "usart.h"
 
-#define MAX_HGCODE_BUFFER 500
+#include "common.h"
+
+#define MAX_HGCODE_BUFFER 700
 #define MAX_COMMAND 20
 
 #define HGCODE_G		0
@@ -116,8 +118,8 @@ void HGCodeDMAStart(void);
 void HGCodeDMAPause(void);
 void HGCodeDMAResume(void);
 
-int8_t HGCodeCheckCommandBuffer(void);
-int8_t HGCodeCheckDataBuffer(void);
+bool HGCodeCheckCommandBuffer(void);
+bool HGCodeCheckDataBuffer(void);
 
 void HGCodeDecodeCommand(void);
 

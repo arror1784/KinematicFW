@@ -259,7 +259,7 @@ int main(void)
 					break;
 				}
 			}
-				memset(temp,0x00,sizeof(HGCodeDataControl_t));
+			memset(temp,0x00,sizeof(HGCodeDataControl_t));
 		}
     /* USER CODE END WHILE */
 
