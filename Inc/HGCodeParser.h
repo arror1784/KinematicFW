@@ -15,7 +15,7 @@
 #include "common.h"
 
 #define MAX_HGCODE_BUFFER 700
-#define MAX_COMMAND 20
+#define MAX_COMMAND 25
 
 #define HGCODE_G		0
 #define HGCODE_H		1
