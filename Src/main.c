@@ -161,6 +161,8 @@ int main(void)
   {
 	  if(HGCodeCheckDataBuffer()){
 			temp = HGCodeGetCommandData();
+			if(!temp)
+				continue;
 
 			sprintf((char*)buff,"Count: %4d, G: %4d, H: %4d, A: %d, B: %d, C: %d M: %d\r\n",
 								commandCount++,temp->HGCodeCommand.G,temp->HGCodeCommand.H,

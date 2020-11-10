@@ -65,12 +65,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
-volatile uint32_t frt_before_time = 0;
-volatile uint32_t end_before_time = 0;
-volatile uint32_t TIM7count = 0;
-volatile uint8_t blankFlag = 0;
-
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
