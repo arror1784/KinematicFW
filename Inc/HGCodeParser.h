@@ -10,10 +10,12 @@
 
 #include <stdint.h>
 #include <stm32f4xx_hal.h>
-#include <usart.h>
+#include "usart.h"
 
-#define MAX_HGCODE_BUFFER 500
-#define MAX_COMMAND 20
+#include "common.h"
+
+#define MAX_HGCODE_BUFFER 700
+#define MAX_COMMAND 25
 
 #define HGCODE_G		0
 #define HGCODE_H		1
@@ -107,7 +109,7 @@ typedef struct{
 
 }HGCodeState_t;
 
-
+void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
 
 void HGCodeInit(UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
 //void HGCodeDMASetBuffer(int8_t *,uint16_t);
@@ -116,8 +118,8 @@ void HGCodeDMAStart(void);
 void HGCodeDMAPause(void);
 void HGCodeDMAResume(void);
 
-int8_t HGCodeCheckCommandBuffer(void);
-int8_t HGCodeCheckDataBuffer(void);
+bool HGCodeCheckCommandBuffer(void);
+bool HGCodeCheckDataBuffer(void);
 
 void HGCodeDecodeCommand(void);
 

@@ -38,7 +38,7 @@ bool STMotorInitHandler(STMotorHandle_t* STMotorHandle, TIM_HandleTypeDef* Handl
 
 	endStopSignal = FALSE;
 
-	STMotorDeviceControl.SetEnableGPIO(STMotorHandle,FALSE);
+	SetEnableGPIO(STMotorHandle,FALSE);
 	return TRUE;
 }
 
@@ -80,7 +80,7 @@ uint8_t STMotorGetMotorStep(STMotorHandle_t* STMotorHandle){
 	//return STMotorHandle->motorParam.motorStep;
 	return MOTOR_MOTOR_STEP;
 }
-uint8_t STMotorGetScrewPitch(STMotorDeviceControl_t* STMotorHandle){
+uint8_t STMotorGetScrewPitch(STMotorHandle_t* STMotorHandle){
 	//return STMotorHandle->motorParam.screwPitch;
 	return MOTOR_SCREW_PITCH;
 }
@@ -130,6 +130,10 @@ uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uin
 	uint32_t maxSpeed = STMotorHandle->motorParam.maxSpeed;
 	uint32_t acc = 0;
 	uint32_t dec = 0;
+#ifdef LOGGING
+	uint8_t buff[100] = {0};
+#endif
+
 	if(mode == 1){
 		acc = STMotorHandle->motorParam.accel_2;
 		dec = STMotorHandle->motorParam.decel_2;
@@ -169,6 +173,11 @@ uint32_t STMotorCalcAccelSpeed(STMotorHandle_t* STMotorHandle,uint32_t nStep,uin
 		STMotorHandle->motorParam.endAccel = accSteps;
 		STMotorHandle->motorParam.startDecel = nStep - decSteps - 1;
 	}
+#ifdef LOGGING
+	sprintf((char*)buff,"max %6d min %6d acc %6d dec %6d endAccel %6d startDecel %6d nStep %6d\r\n",
+			maxSpeed,minSpeed,acc,dec,STMotorHandle->motorParam.endAccel,STMotorHandle->motorParam.startDecel,nStep);
+	while(HAL_UART_Transmit(&huart3,buff,strlen((char*)buff),1000) != HAL_OK);
+#endif
 	return 0;
 }
 
@@ -199,11 +208,11 @@ uint32_t STMotorGoStep(STMotorHandle_t* STMotorHandle,int32_t step,uint8_t mode)
 		}else if(step < 0) {
 			STMotorHandle->motorParam.targetStep = (-step) - 1;
 			STMotorHandle->motorParam.direction = DIR_BACKWORD;
-			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_BACKWORD);
+			SetDirectionGPIO(STMotorHandle,DIR_BACKWORD);
 		}else{
 			STMotorHandle->motorParam.targetStep = step - 1;
 			STMotorHandle->motorParam.direction = DIR_FORWORD;
-			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_FORWORD);
+			SetDirectionGPIO(STMotorHandle,DIR_FORWORD);
 		}
 
 		STMotorCalcAccelSpeed(STMotorHandle,STMotorHandle->motorParam.targetStep,mode);
@@ -243,9 +252,9 @@ uint32_t STMotorGoSpeed(STMotorHandle_t* STMotorHandle,int32_t speed,uint16_t ti
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			return 0;
 		}else if(speed < 0) {
-			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_BACKWORD);
+			SetDirectionGPIO(STMotorHandle,DIR_BACKWORD);
 		}else{
-			STMotorDeviceControl.SetDirectionGPIO(STMotorHandle,DIR_FORWORD);
+			SetDirectionGPIO(STMotorHandle,DIR_FORWORD);
 		}
 		STMotorHandle->motorParam.accu = 0;
 		STMotorHandle->motorParam.endAccel = 0;
@@ -285,7 +294,7 @@ uint32_t STMotorAutoHome(STMotorHandle_t* STMotorHandle,int32_t speed){
 			STMotorHandle->motorParam.targetStep = 0;
 			STMotorHandle->motorHandler.isActivate = FALSE;
 			STMotorSetHome(STMotorHandle);
-			STMotorDeviceControl.FinishCallBack(STMotorHandle);
+			FinishCallBack(STMotorHandle);
 			return 1;
 		}
 	}else{
@@ -333,7 +342,7 @@ uint32_t STMotorGoHome(STMotorHandle_t* STMotorHandle){
 
 	int32_t step = -STMotorHandle->motorParam.curPosition;
 	if(STMotorGoStep(STMotorHandle,step,0) == 1){
-		STMotorDeviceControl.FinishCallBack(STMotorHandle);
+		FinishCallBack(STMotorHandle);
 	}
 	return 0;
 }
@@ -464,7 +473,7 @@ uint32_t STMotorPWMPulseInterruptHandle(STMotorHandle_t* STMotorHandle){
 //			STMotorDeviceControl.SetEnableGPIO(STMotorHandle,TRUE);
 			STMotorStopFreq(STMotorHandle);
 			STMotorHandle->motorHandler.isActivate = FALSE;
-			STMotorDeviceControl.FinishCallBack(STMotorHandle);
+			FinishCallBack(STMotorHandle);
 
 			break;
 		case STATE_FINISH_AUTO_HOME:
@@ -519,7 +528,7 @@ void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle){
 				endStopSignal = FALSE;
 				endStopCheckingBouncing = -1;
 				F=0;
-				STMotorDeviceControl.FinishCallBack(STMotorHandle);
+				FinishCallBack(STMotorHandle);
 				STMotorHandle->motorHandler.autoHoming = FALSE;
 
 				while(HAL_UART_Transmit(&huart3,"sucess\r\n",8,1000) != HAL_OK);
@@ -536,6 +545,3 @@ void STMotorEXTInterruptENDBouncing(STMotorHandle_t* STMotorHandle){
 
 	}
 }
-
-
-

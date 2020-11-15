@@ -17,13 +17,7 @@
 
 extern HGCodeControl_t HGCodeControl;
 
-void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle){
 
-	HGCodeInit(HGCodeUsartHandle,HGCodeDmaHandle);
-	HGCodeDMAStart();
-	HAL_TIM_Base_Start_IT(timHandler);
-
-}
 void G01(HGCodeDataControl_t* temp){
 	if(temp->HGCodeParameter.A){
 		if(!STMotorIsActivate(&STMotorDevices[0])){
@@ -157,10 +151,10 @@ void H33(HGCodeDataControl_t* temp){ //SET DECEL SPEED
 }
 void H34(HGCodeDataControl_t* temp){ //SET motor enable
 	if(temp->HGCodeParameter.A){
-		STMotorDeviceControl.SetEnableGPIO(&STMotorDevices[0],TRUE);
+		SetEnableGPIO(&STMotorDevices[0],TRUE);
 		temp->HGCodeParameter.A = 0;
 	}else{
-		STMotorDeviceControl.SetEnableGPIO(&STMotorDevices[0],FALSE);
+		SetEnableGPIO(&STMotorDevices[0],FALSE);
 		temp->HGCodeParameter.A = 0;
 	}
 	HAL_Delay(5);
@@ -239,8 +233,6 @@ void H101(HGCodeDataControl_t* temp){
 	int8_t k=0;
 	uint8_t buf[10] = {0};
 	HGCodeDMAPause();
-//	while (1){
-//		if(SerialKeyPressed(&k)){
 	k = SerialDownload_backup();
 	if(k == 0){
 		sprintf(buf,"%d\r\n",k);
@@ -253,20 +245,8 @@ void H101(HGCodeDataControl_t* temp){
 		HAL_UART_Transmit(&huart3,buf,10,1000);
 //		break;
 	}
-//		}
-//	}
 	HGCodeDMAResume();
 	HAL_UART_Transmit(&huart3,"YMODEM FINISH\r\n",15,1000);
-//	pFunction Jump_To_Application;
-//	uint32_t JumpAddress;
-//	HAL_UART_Transmit(&huart3,"IAPr\n",5,1000);
-//
-//	JumpAddress = *(__IO uint32_t*) ((uint32_t)0x08000000 + 4);
-//	/* Jump to user application */
-//	Jump_To_Application = (pFunction) JumpAddress;
-//	/* Initialize user application's Stack Pointer */
-//	__set_MSP(*(__IO uint32_t*) (uint32_t)0x08000000);
-//	Jump_To_Application();
 }
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();

@@ -19,4 +19,6 @@ typedef enum{
 void setLCDState(LCDState_t);
 LCDState_t getLCDState();
 
+void LCDCheckEXTIHandle();
+
 #endif /* LCDCHECK_H_ */

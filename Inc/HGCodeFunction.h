@@ -16,29 +16,6 @@
 #include "StepMotorDriver.h"
 #include "neoPixel.h"
 
-/*typedef struct{
-
-	void (*G0)(void);
-	void (*G1)(void);
-	void (*G4)(void);
-	void (*G5)(void);
-	void (*G27)(void);
-	void (*G28)(void);
-	void (*G30)(void);
-	void (*G31)(void);
-	void (*G99)(void);
-
-	void (*H0)(void);
-	void (*H5)(void);
-	void (*H10)(void);
-	void (*H11)(void);
-
-}HGCodeFunction_t;*/
-
-typedef  void (*pFunction)(void);
-
-void startHGCode(TIM_HandleTypeDef* timHandler,UART_HandleTypeDef* HGCodeUsartHandle,DMA_HandleTypeDef* HGCodeDmaHandle);
-
 void G01(HGCodeDataControl_t* temp); // go micro relative
 void G02(HGCodeDataControl_t* temp); // go absolute
 void G03(HGCodeDataControl_t* temp); // go step

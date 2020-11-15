@@ -27,10 +27,6 @@ typedef struct{
 
 }WS2812BControl_t, *WS2812BControl_p;
 
-extern DMA_HandleTypeDef hdma_tim1_ch4_trig_com;
-extern WS2812BControl_t neoPixel;
-extern WS2812BControl_p neoPixel_P;
-
 void setNeoPixel(WS2812BControl_t *WS2812BControl,TIM_HandleTypeDef* timerControl,uint32_t channel,DMA_HandleTypeDef* timerDMAControl,uint16_t ledCount,TIM_HandleTypeDef* blankTimer);
 
 uint32_t converColorTo32(uint8_t green,uint8_t red,uint8_t blue);

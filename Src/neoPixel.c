@@ -6,9 +6,9 @@
  */
 #include "neoPixel.h"
 
-uint32_t  blankLedbuf[10*24+48] = {0};
-WS2812BControl_t neoPixel = {0};
-WS2812BControl_p neoPixel_P = &neoPixel;
+//uint32_t  blankLedbuf[10*24+48] = {0};
+//WS2812BControl_t neoPixel = {0};
+//WS2812BControl_p neoPixel_P = &neoPixel;
 
 void setNeoPixel(WS2812BControl_t *WS2812BControl,TIM_HandleTypeDef* timerControl,uint32_t channel,DMA_HandleTypeDef* timerDMAControl,uint16_t ledCount,TIM_HandleTypeDef* blankTimer){
 	WS2812BControl->bitBuff = (uint32_t*)malloc(sizeof(uint32_t) * 24 * (ledCount + 2));
@@ -102,12 +102,12 @@ void NPEXITHandle(WS2812BControl_t *WS2812BControl){
 	if(WS2812BControl->mode == 1){
 		if(WS2812BControl->blankCount == 4){
 			if(WS2812BControl->blankFlag)
-				updateColor(neoPixel_P,-1);
+				updateColor(WS2812BControl,-1);
 			else{
-				for(int i = 0 ; i < neoPixel_P->ledCount; i++){
+				for(int i = 0 ; i < WS2812BControl->ledCount; i++){
 					setColorArr(&buff[24],converColorTo32(0,0,0),i);
 				}
-				updateColorBuff(neoPixel_P,buff,10*24+48,-1);
+				updateColorBuff(WS2812BControl,buff,10*24+48,-1);
 			}
 			WS2812BControl->blankFlag = ~WS2812BControl->blankFlag;
 
