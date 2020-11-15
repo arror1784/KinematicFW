@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "stm32f4xx_hal.h"
 
-#define LOGGING
+//#define LOGGING
 
 #define FW_NUMBER 0.0.0
 
