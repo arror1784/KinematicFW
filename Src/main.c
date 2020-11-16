@@ -62,8 +62,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define APPLICATION_ADDRESS (uint32_t)0x08004000
-#define REBOOT_CHECK_ADDRESS (uint32_t)0x08020000
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -159,13 +158,13 @@ int main(void)
   }else{
 	  reboot_flag = FALSE;
 	  powerOn();
-	  FLASH_Erase_Sector(FLASH_SECTOR_5,FLASH_VOLTAGE_RANGE_3);
-	  FLASH_WaitForLastOperation(1000);
-	  uint32_t err = HAL_FLASH_GetError();
-	  if (err != 0) {
-		  HAL_FLASH_Lock();
-		  return (err);
-	  }
+//	  FLASH_Erase_Sector(FLASH_SECTOR_5,FLASH_VOLTAGE_RANGE_3);
+//	  FLASH_WaitForLastOperation(1000);
+//	  uint32_t err = HAL_FLASH_GetError();
+//	  if (err != 0) {
+//		  HAL_FLASH_Lock();
+//		  return (err);
+//	  }
 	  FLASH_If_Write((uint32_t*)&reboot_flag_addr,(uint32_t*)&reboot_flag,1);
   }
   /* USER CODE END 2 */

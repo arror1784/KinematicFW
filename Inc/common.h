@@ -32,6 +32,9 @@
 
 #define AUTO_REBOOT						1
 
+#define APPLICATION_ADDRESS (uint32_t)0x08004000
+#define REBOOT_CHECK_ADDRESS (uint32_t)0x08020000
+
 typedef uint8_t                        bool;
 
 typedef enum{
