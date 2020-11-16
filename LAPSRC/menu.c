@@ -49,7 +49,7 @@ uint8_t tab_1024[1024] =
 uint8_t FileName[FILE_NAME_LENGTH];
 
 /* Private function prototypes -----------------------------------------------*/
-    // 占쏙옙占쏙옙占� 占싱듸옙
+    // �뜝�룞�삕�뜝�룞�삕�뜝占� �뜝�떛�벝�삕
 void SerialUpload(void);
 
 /* Private functions ---------------------------------------------------------*/
@@ -140,9 +140,9 @@ int SerialDownload_update(void){
 int SerialDownload_backup(void){
     uint8_t Number[10] = "          ";
   int32_t Size = 0;
-
+  uint8_t firstPacket[1024] = { 0 };
 //  SerialPutString("Waiting for the file to be sent ... (press 'a' to abort)\n\r");
-  Size = Ymodem_Receive_backup(&tab_1024[0]);
+  Size = Ymodem_Receive_backup(&tab_1024[0],firstPacket);
   if (Size > 0)
   {
     SerialPutString("\n\n\r Programming Completed Successfully!\n\r--------------------------------\r\n Name: ");

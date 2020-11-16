@@ -276,7 +276,7 @@ int32_t Ymodem_Receive (uint8_t *buf)
   return (int32_t)size;
 }
 
-int32_t Ymodem_Receive_backup (uint8_t *buf){
+int32_t Ymodem_Receive_backup (uint8_t *buf,uint8_t *firstPacket){
   uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD], file_size[FILE_SIZE_LENGTH], *file_ptr, *buf_ptr;
   int32_t i, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
   volatile uint32_t flashdestination, ramsource, flash_err;        /* modified by jrkim */
@@ -366,8 +366,15 @@ int32_t Ymodem_Receive_backup (uint8_t *buf){
                   memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
                   ramsource = (uint32_t)buf;
 
+//                  if(((*(__IO uint32_t*)MAIN_APPLICATION_ADDRESS) & 0x2FFD0000 ) != 0x20000000){
+
                   /* Write received data in Flash */
-                  if (FLASH_If_Write(&flashdestination, (uint32_t*) ramsource, (uint16_t) packet_length/4)  == 0)
+                  if(flashdestination == BACKUP_APPLICATION_ADDRESS){
+                	  memcpy(firstPacket,ramsource,packet_length);
+                	  flashdestination += ((uint16_t) packet_length/4) * 4;
+                      Send_Byte(ACK);
+                  }
+                  else if(FLASH_If_Write(&flashdestination, (uint32_t*) ramsource, (uint16_t) packet_length/4)  == 0)
                   {
                     Send_Byte(ACK);
                   }
