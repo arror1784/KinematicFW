@@ -235,9 +235,7 @@ void H101(HGCodeDataControl_t* temp){
 	HGCodeDMAPause();
 	k = SerialDownload_backup();
 	if(k == 0){
-		sprintf(buf,"%d\r\n",k);
 		HAL_UART_Transmit(&huart3,"YMODEM SUCESS\r\n",15,1000);
-		HAL_UART_Transmit(&huart3,buf,10,1000);
 //		break;
 	}else{
 		sprintf(buf,"%d\r\n",k);
@@ -248,10 +246,19 @@ void H101(HGCodeDataControl_t* temp){
 	HGCodeDMAResume();
 	HAL_UART_Transmit(&huart3,"YMODEM FINISH\r\n",15,1000);
 }
+void H111(HGCodeDataControl_t* temp){
+	sendResponse(0,111,AUTO_REBOOT);
+}
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();
 }
 void H201(HGCodeDataControl_t* temp){
+	FLASH_Erase_Sector(FLASH_SECTOR_5,FLASH_VOLTAGE_RANGE_3);
+	FLASH_WaitForLastOperation(1000);
+	uint32_t err = HAL_FLASH_GetError();
+	if (err != 0) {
+		HAL_FLASH_Lock();
+	}
 	softPowerOff();
 	NVIC_SystemReset();
 }

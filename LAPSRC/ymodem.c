@@ -302,6 +302,7 @@ int32_t Ymodem_Receive_backup (uint8_t *buf){
             case 0:
               Send_Byte(ACK);
               file_done = 1;
+              session_done = 1;
               break;
             /* Normal packet */
             default:

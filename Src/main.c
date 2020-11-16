@@ -263,6 +263,9 @@ int main(void)
 				case 101:
 					H101(temp);
 					break;
+				case 111:
+					H111(temp);
+					break;
 				case 200:
 					H200(temp);
 					break;

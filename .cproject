@@ -133,6 +133,7 @@
 							<inputType id="com.atollic.truestudio.gcc.input.1274347818" superClass="com.atollic.truestudio.gcc.input"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.1410963483" name="HGCodeFunction.h" rcbsApplicability="disable" resourcePath="Inc/HGCodeFunction.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="LAPSRC"/>
