@@ -261,20 +261,17 @@ void H200(HGCodeDataControl_t* temp){
 	softPowerOff();
 }
 void H201(HGCodeDataControl_t* temp){
+
 	HAL_FLASH_Unlock();
 	FLASH_Erase_Sector(FLASH_SECTOR_5,FLASH_VOLTAGE_RANGE_3);
 	FLASH_WaitForLastOperation(1000);
 	HAL_FLASH_Lock();
-	uint32_t reboot_flag_addr = REBOOT_CHECK_ADDRESS;
-	uint32_t reboot_flag = 0xFFFFFFFF;
-
-//	while(FLASH_If_Write((uint32_t*)&reboot_flag_addr,(uint32_t*)&reboot_flag,1));
-//	FLASH_WaitForLastOperation(1000);
 
 	uint32_t err = HAL_FLASH_GetError();
 	if (err != 0) {
 		HAL_FLASH_Lock();
 	}
+
 	softPowerOff();
 	NVIC_SystemReset();
 }
