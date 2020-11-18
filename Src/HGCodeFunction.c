@@ -230,14 +230,20 @@ void H91(HGCodeDataControl_t* temp){
 }
 void H101(HGCodeDataControl_t* temp){
 
-	int8_t k=0;
+	int32_t k=0;
 	uint8_t buf[10] = {0};
+	uint8_t tab_1024[1024] = { 0 };
+	uint8_t firstPacket[1024] = { 0 };
+	uint32_t backupFirstAddress = BACKUP_APPLICATION_ADDRESS;
+
 	HGCodeDMAPause();
-	k = SerialDownload_backup();
-	if(k == 0){
-		sprintf(buf,"%d\r\n",k);
+	k = Ymodem_Receive_backup(&tab_1024[0],&firstPacket[0]);
+
+	FLASH_If_Write(&backupFirstAddress, (uint32_t*) firstPacket, 1024/4);
+	FLASH_WaitForLastOperation(1000);
+
+	if(k > 0){
 		HAL_UART_Transmit(&huart3,"YMODEM SUCESS\r\n",15,1000);
-		HAL_UART_Transmit(&huart3,buf,10,1000);
 //		break;
 	}else{
 		sprintf(buf,"%d\r\n",k);
@@ -248,10 +254,24 @@ void H101(HGCodeDataControl_t* temp){
 	HGCodeDMAResume();
 	HAL_UART_Transmit(&huart3,"YMODEM FINISH\r\n",15,1000);
 }
+void H111(HGCodeDataControl_t* temp){
+	sendResponse(0,111,AUTO_REBOOT);
+}
 void H200(HGCodeDataControl_t* temp){
 	softPowerOff();
 }
 void H201(HGCodeDataControl_t* temp){
+
+	HAL_FLASH_Unlock();
+	FLASH_Erase_Sector(FLASH_SECTOR_5,FLASH_VOLTAGE_RANGE_3);
+	FLASH_WaitForLastOperation(1000);
+	HAL_FLASH_Lock();
+
+	uint32_t err = HAL_FLASH_GetError();
+	if (err != 0) {
+		HAL_FLASH_Lock();
+	}
+
 	softPowerOff();
 	NVIC_SystemReset();
 }

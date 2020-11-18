@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "stm32f4xx_hal.h"
 
-#define LOGGING
+//#define LOGGING
 
 #define FW_NUMBER 0.0.0
 
@@ -29,6 +29,11 @@
 #define MOTOR_MICRO_STEP				16
 #define MOTOR_SCREW_PITCH				2000 // unit : micro
 #define MOTOR_SCREW_PITCH_MIL			2
+
+#define AUTO_REBOOT						1
+
+#define APPLICATION_ADDRESS (uint32_t)0x08004000
+#define REBOOT_CHECK_ADDRESS (uint32_t)0x08020000
 
 typedef uint8_t                        bool;
 

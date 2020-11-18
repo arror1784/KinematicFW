@@ -45,14 +45,14 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "HGCodeFunction.h"
 #include "PrinterStateControl.h"
 #include "usart.h"
 #include "common.h"
-
+#include "flash_if.h"
+#include "stm32f4xx_hal_flash_ex.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,7 +62,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define APPLICATION_ADDRESS (uint32_t) 0x08004000
 
 /* USER CODE END PD */
 
@@ -151,8 +150,23 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim7); //blank timer
 
 //  powerOn();
-  powerOff();
+  uint32_t reboot_flag = *(uint32_t*) REBOOT_CHECK_ADDRESS;
+  uint32_t reboot_flag_addr = REBOOT_CHECK_ADDRESS;
 
+  if(!reboot_flag){
+	  powerOff();
+  }else{
+	  reboot_flag = FALSE;
+	  powerOn();
+//	  FLASH_Erase_Sector(FLASH_SECTOR_5,FLASH_VOLTAGE_RANGE_3);
+//	  FLASH_WaitForLastOperation(1000);
+//	  uint32_t err = HAL_FLASH_GetError();
+//	  if (err != 0) {
+//		  HAL_FLASH_Lock();
+//		  return (err);
+//	  }
+	  FLASH_If_Write((uint32_t*)&reboot_flag_addr,(uint32_t*)&reboot_flag,1);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -247,6 +261,9 @@ int main(void)
 					break;
 				case 101:
 					H101(temp);
+					break;
+				case 111:
+					H111(temp);
 					break;
 				case 200:
 					H200(temp);
